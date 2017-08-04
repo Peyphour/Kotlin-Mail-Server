@@ -1,0 +1,3 @@
+smtp:
+  port: 25
+  sessionTimeout: 60000

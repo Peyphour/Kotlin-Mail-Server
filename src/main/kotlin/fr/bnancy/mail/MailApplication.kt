@@ -1,13 +1,11 @@
 package fr.bnancy.mail
 
-import fr.bnancy.mail.server.Server
+import org.springframework.boot.SpringApplication
+import org.springframework.boot.autoconfigure.SpringBootApplication
 
-
+@SpringBootApplication
+class MailApplication
 fun main(args: Array<String>) {
-    val server: Server = Server(25)
-    server.run()
-
-    println("Starting SMTP server on port " + 25)
-
-    Runtime.getRuntime().addShutdownHook(Thread(server::stop))
+    SpringApplication.run(MailApplication::class.java, *args)
 }
+

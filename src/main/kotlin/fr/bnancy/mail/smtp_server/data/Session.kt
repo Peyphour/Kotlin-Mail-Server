@@ -1,4 +1,4 @@
-package fr.bnancy.mail.server
+package fr.bnancy.mail.smtp_server.data
 
 data class Session(
         var from: String = "",
