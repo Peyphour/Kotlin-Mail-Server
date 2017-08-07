@@ -5,5 +5,7 @@ enum class SmtpResponseCode(val code: String) {
     OK("250"),
     DATA("354"),
     QUIT("221"),
+    INVALID("500 Invalid command"),
+    MAILBOX_UNAVAILABLE("450"),
     UNKNOWN("")
 }

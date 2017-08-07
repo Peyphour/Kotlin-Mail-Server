@@ -7,6 +7,8 @@ import java.io.InputStream
 import java.io.PrintWriter
 import java.net.Socket
 
+
+// TODO: implement flow control and mailbox validation
 class ClientRunnable(val clientSocket: Socket, val listener: SessionListener, val sessionTimeout: Int): Runnable {
 
     var running: Boolean = true
@@ -16,9 +18,12 @@ class ClientRunnable(val clientSocket: Socket, val listener: SessionListener, va
         val stream: InputStream = this.clientSocket.getInputStream()
         val out: PrintWriter = PrintWriter(this.clientSocket.getOutputStream(), true)
         var timeout: Long = System.currentTimeMillis()
+
         session.netAddress = this.clientSocket.inetAddress.hostAddress
         listener.sessionOpened(session)
+
         out.println(SmtpResponseCode.HELO.code)
+
         while(running && (System.currentTimeMillis() - timeout < sessionTimeout)) {
             if (stream.available() > 0) {
                 val buffer: ByteArray = ByteArray(stream.available())
@@ -29,6 +34,7 @@ class ClientRunnable(val clientSocket: Socket, val listener: SessionListener, va
                 running = !session.end
             }
         }
+
         clientSocket.close()
         listener.sessionClosed(session)
     }

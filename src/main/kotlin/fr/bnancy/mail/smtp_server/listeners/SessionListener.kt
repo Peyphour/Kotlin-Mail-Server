@@ -5,4 +5,5 @@ import fr.bnancy.mail.smtp_server.data.Session
 interface SessionListener {
     fun sessionOpened(session: Session)
     fun sessionClosed(session: Session)
+    fun acceptMail(session: Session): Boolean
 }

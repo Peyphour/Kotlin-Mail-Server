@@ -14,4 +14,8 @@ class MailEventListener: SessionListener {
     override fun sessionClosed(session: Session) {
         println(Mail(session))
     }
+
+    override fun acceptMail(session: Session): Boolean {
+        return true
+    }
 }
