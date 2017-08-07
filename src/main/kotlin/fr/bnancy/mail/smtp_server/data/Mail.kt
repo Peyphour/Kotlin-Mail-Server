@@ -4,7 +4,7 @@ class Mail(session: Session) {
     val from = session.from
     val to = session.to
     val headers = parseHeaders(session.content)
-    val content = dropHeaders(session.content)
+    val content = parseContent(session.content)
 
     private fun parseHeaders(content: String): List<Header> {
         val headers: MutableList<Header> = ArrayList()
@@ -24,7 +24,7 @@ class Mail(session: Session) {
         return headers
     }
 
-    private fun dropHeaders(content: String): String {
+    private fun parseContent(content: String): String {
         return content.lines()
                 .dropWhile { !it.isEmpty() }
                 .joinToString("\n")

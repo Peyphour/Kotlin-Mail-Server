@@ -6,6 +6,8 @@ enum class SmtpResponseCode(val code: String) {
     DATA("354"),
     QUIT("221"),
     INVALID("500 Invalid command"),
-    MAILBOX_UNAVAILABLE("450"),
+    BAD_SEQUENCE("503 Bad sequence"),
+    MAILBOX_UNAVAILABLE("450 Mailbox doesn't exists here"),
+    SENDER_BLACKLIST("451 Sender blacklisted"),
     UNKNOWN("")
 }

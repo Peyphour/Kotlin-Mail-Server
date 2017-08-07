@@ -1,14 +1,13 @@
 package fr.bnancy.mail.smtp_server
 
 import fr.bnancy.mail.smtp_server.data.Session
+import fr.bnancy.mail.smtp_server.data.SessionState
 import fr.bnancy.mail.smtp_server.data.SmtpResponseCode
 import fr.bnancy.mail.smtp_server.listeners.SessionListener
 import java.io.InputStream
 import java.io.PrintWriter
 import java.net.Socket
 
-
-// TODO: implement flow control and mailbox validation
 class ClientRunnable(val clientSocket: Socket, val listener: SessionListener, val sessionTimeout: Int): Runnable {
 
     var running: Boolean = true
@@ -31,7 +30,9 @@ class ClientRunnable(val clientSocket: Socket, val listener: SessionListener, va
                 timeout = System.currentTimeMillis()
                 val response = handleCommand(buffer, session)
                 out.println(response.code)
-                running = !session.end
+                running = (session.state != SessionState.END)
+                if (session.state == SessionState.WAIT_QUIT)
+                    listener.deliverMail(session)
             }
         }
 
@@ -44,27 +45,58 @@ class ClientRunnable(val clientSocket: Socket, val listener: SessionListener, va
 
         val mailRegex = Regex("<(.*)>")
 
-        if(data.startsWith("HELO") || data.startsWith("EHLO"))
-            return SmtpResponseCode.OK
-        else if(data.startsWith("MAIL FROM")) {
-            session.from = mailRegex.find(data)!!.groupValues[1]
-            return SmtpResponseCode.OK
-        } else if (data.startsWith("RCPT TO")) {
-            session.to.add(mailRegex.find(data)!!.groupValues[1])
-            return SmtpResponseCode.OK
-        } else if (data.startsWith("DATA") && !session.expectData) {
-            session.expectData = true
-            return SmtpResponseCode.DATA
-        } else if(session.expectData) {
-            session.content += data
-            if(session.content.endsWith("\r\n.\r\n")) {
-                session.expectData = false
-                session.content = session.content.dropLast(5) // remove CRLF.CRLFL
+        // I'm a state machine baby!
+        when (session.state) {
+            SessionState.START -> if(data.startsWith("HELO") || data.startsWith("EHLO")) {
+                session.state = SessionState.WAIT_FROM
                 return SmtpResponseCode.OK
+            } else {
+                return SmtpResponseCode.BAD_SEQUENCE
             }
-        } else if(data.startsWith("QUIT")) {
-            session.end = true
-            return SmtpResponseCode.QUIT
+            SessionState.WAIT_FROM -> if (data.startsWith("MAIL FROM")) {
+                val address = mailRegex.find(data)!!.groupValues[1]
+                if (listener.acceptSender(address)) {
+                    session.from = address
+                    session.state = SessionState.WAIT_TO
+                    return SmtpResponseCode.OK
+                } else {
+                    return SmtpResponseCode.SENDER_BLACKLIST
+                }
+            } else {
+                return SmtpResponseCode.BAD_SEQUENCE
+            }
+            SessionState.WAIT_TO -> if (data.startsWith("RCPT TO")) {
+                val address = mailRegex.find(data)!!.groupValues[1]
+                if (listener.acceptRecipient(address))
+                    session.to.add(address)
+                else {
+                    return SmtpResponseCode.MAILBOX_UNAVAILABLE
+                }
+                return SmtpResponseCode.OK
+            } else if (data.startsWith("DATA") && session.to.size > 0) {
+                session.state = SessionState.WAIT_DATA
+                return SmtpResponseCode.DATA
+            } else {
+                return SmtpResponseCode.BAD_SEQUENCE
+            }
+            SessionState.WAIT_DATA -> {
+                session.content += data
+                if(session.content.endsWith("\r\n.\r\n")) {
+                    session.content = session.content.dropLast(5) // remove CRLF.CRLF
+                    session.state = SessionState.WAIT_QUIT
+                    return SmtpResponseCode.OK
+                }
+            }
+            SessionState.WAIT_QUIT -> {
+                if (data.startsWith("QUIT")) {
+                    session.state = SessionState.END
+                    return SmtpResponseCode.QUIT
+                }
+            }
+            SessionState.END -> {
+                if(!data.isEmpty())
+                    return SmtpResponseCode.BAD_SEQUENCE
+            }
         }
         return SmtpResponseCode.UNKNOWN
     }
