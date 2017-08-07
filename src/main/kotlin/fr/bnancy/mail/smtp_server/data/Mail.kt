@@ -1,12 +1,23 @@
 package fr.bnancy.mail.smtp_server.data
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import javax.persistence.*
+
+@Entity
 class Mail(session: Session) {
-    val from = session.from
-    val to = session.to
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    val id: Long = 0
+
+    val sender = session.from
+    val recipients = session.to
+    @Lob
     val headers = parseHeaders(session.content)
+    @Lob
     val content = parseContent(session.content)
 
-    private fun parseHeaders(content: String): List<Header> {
+    private fun parseHeaders(content: String): String {
         val headers: MutableList<Header> = ArrayList()
         for (line: String in content.lines()) {
             val header: Header = Header("", "")
@@ -21,7 +32,7 @@ class Mail(session: Session) {
             } else
                 continue // invalid line : drop it
         }
-        return headers
+        return ObjectMapper().writeValueAsString(headers)
     }
 
     private fun parseContent(content: String): String {
@@ -31,6 +42,6 @@ class Mail(session: Session) {
     }
 
     override fun toString(): String {
-        return "Mail(from='$from', to=$to, headers=$headers, content='$content')"
+        return "Mail(sender='$sender', recipients=$recipients, headers=$headers, content='$content')"
     }
 }
