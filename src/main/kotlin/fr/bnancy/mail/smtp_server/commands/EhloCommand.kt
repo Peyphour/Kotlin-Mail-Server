@@ -6,10 +6,9 @@ import fr.bnancy.mail.smtp_server.data.SessionState
 import fr.bnancy.mail.smtp_server.data.SmtpResponseCode
 import fr.bnancy.mail.smtp_server.listeners.SessionListener
 
-@Command("HELO")
-class HeloCommand: AbstractCommand {
+@Command("EHLO")
+class EhloCommand: AbstractCommand {
     override fun execute(data: String, session: Session, listener: SessionListener): SmtpResponseCode {
-
         val split = data.split(" ")
 
         if(split.size != 2)
@@ -19,6 +18,7 @@ class HeloCommand: AbstractCommand {
 
         session.state.add(SessionState.HELO)
 
-        return SmtpResponseCode.OK("")
+        return SmtpResponseCode.EHLO
     }
+
 }
