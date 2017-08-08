@@ -1,20 +1,13 @@
 package fr.bnancy.mail.smtp_server.data
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import javax.persistence.*
+import fr.bnancy.mail.smtp_server.data.entities.Mail
 
-@Entity
 class Mail(session: Session) {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    val id: Long = 0
 
     val sender = session.from
     val recipients = session.to
-    @Lob
     val headers = parseHeaders(session.content)
-    @Lob
     val content = parseContent(session.content)
 
     private fun parseHeaders(content: String): String {
@@ -43,5 +36,9 @@ class Mail(session: Session) {
 
     override fun toString(): String {
         return "Mail(sender='$sender', recipients=$recipients, headers=$headers, content='$content')"
+    }
+
+    fun toEntity(): Mail {
+        return Mail(0, sender, recipients, headers, content)
     }
 }

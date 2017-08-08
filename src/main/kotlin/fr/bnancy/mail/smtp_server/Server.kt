@@ -43,5 +43,9 @@ class Server {
         running = false
         clients.forEach { it.stop() }
     }
+
+    fun isRunning(): Boolean {
+        return running
+    }
 }
 

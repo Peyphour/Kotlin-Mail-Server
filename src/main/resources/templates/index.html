@@ -5,6 +5,12 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 </head>
 <body>
-<p th:text="'Hello, ' + ${name} + '!'" ></p>
+<p th:text="'Server status : ' + ${serverStatus ? 'Running' : 'Stopped'} + '!'" ></p>
+<form method="post" action="/start-server">
+    <button>Start server</button>
+</form>
+<form method="post" action="/stop-server">
+    <button>Stop server</button>
+</form>
 </body>
 </html>
