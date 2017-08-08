@@ -5,5 +5,7 @@ data class Session(
         var to: ArrayList<String> = ArrayList(),
         var content: String = "",
         var netAddress: String = "",
-        var state: SessionState = SessionState.START
+        var state: MutableList<SessionState> = emptyList<SessionState>().toMutableList(),
+        var senderHostname: String = "",
+        var receivingData: Boolean = false
 )

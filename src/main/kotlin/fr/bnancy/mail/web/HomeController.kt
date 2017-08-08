@@ -1,6 +1,7 @@
 package fr.bnancy.mail.web
 
 import fr.bnancy.mail.repository.MailRepository
+import fr.bnancy.mail.repository.UserRepository
 import fr.bnancy.mail.smtp_server.Server
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
@@ -17,9 +18,13 @@ class HomeController {
     @Autowired
     lateinit var mailRepository: MailRepository
 
+    @Autowired
+    lateinit var userRepository: UserRepository
+
     @RequestMapping
     fun index(model: Model): String {
         model.addAttribute("serverStatus", smtpServer.isRunning())
+        model.addAttribute("mailAddresses", userRepository.findAll().map { it -> it.mail })
         return "index"
     }
 

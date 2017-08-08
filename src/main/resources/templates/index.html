@@ -12,5 +12,10 @@
 <form method="post" action="/stop-server">
     <button>Stop server</button>
 </form>
+
+<h3>Mail addresses in the system: </h3>
+<div th:each="mail : ${mailAddresses}">
+    <span th:text="${mail}"></span><br />
+</div>
 </body>
 </html>
