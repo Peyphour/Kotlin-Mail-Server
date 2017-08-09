@@ -22,6 +22,9 @@ class MailCommand: AbstractCommand {
         val mailRegex = Regex("<(.*)>")
         val address = mailRegex.find(data)!!.groupValues[1]
 
+        if(!listener.acceptSender(address))
+            return SmtpResponseCode.MAILBOX_UNAVAILABLE("$address isn't authorized to send mail here")
+
         session.from = address
 
         session.state.add(SessionState.MAIL)
