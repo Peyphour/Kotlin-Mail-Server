@@ -43,6 +43,7 @@ class Server {
                 clients.add(ClientRunnable(client, listener, config.sessionTimeout, commands))
                 Thread(clients[clients.size - 1]).start()
             }
+            this.socketServer.close()
         }).start()
 
         println("Starting SMTP server on port ${config.port}")
@@ -51,7 +52,6 @@ class Server {
     fun stop() {
         running = false
         clients.forEach { it.stop() }
-        this.socketServer.close()
     }
 
     fun isRunning(): Boolean {

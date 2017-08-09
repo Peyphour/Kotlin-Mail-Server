@@ -1,5 +1,5 @@
 smtp:
-  port: 25000
+  port: 25
   sessionTimeout: 60000
 
 spring:
