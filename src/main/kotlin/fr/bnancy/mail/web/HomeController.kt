@@ -30,13 +30,15 @@ class HomeController {
 
     @RequestMapping("/start-server", method = arrayOf(RequestMethod.POST))
     fun startSmtpServer(model: Model): String {
-        smtpServer.start()
+        if(!smtpServer.running)
+            smtpServer.start()
         return index(model)
     }
 
     @RequestMapping("/stop-server", method = arrayOf(RequestMethod.POST))
     fun stopSmtpServer(model: Model): String {
-        smtpServer.stop()
+        if(smtpServer.running)
+            smtpServer.stop()
         return index(model)
     }
 
