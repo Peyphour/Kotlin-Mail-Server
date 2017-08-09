@@ -9,6 +9,7 @@ class Mail(session: Session) {
     val recipients = session.to
     val headers = parseHeaders(session.content)
     val content = parseContent(session.content)
+    val date = session.receivedAt
 
     private fun parseHeaders(content: String): String {
         val headers: MutableList<Header> = ArrayList()
@@ -39,6 +40,6 @@ class Mail(session: Session) {
     }
 
     fun toEntity(): Mail {
-        return Mail(0, sender, recipients, headers, content)
+        return Mail(0, sender, recipients, headers, content, date)
     }
 }

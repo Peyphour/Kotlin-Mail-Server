@@ -32,8 +32,10 @@ class ClientRunnable(val clientSocket: Socket, val listener: SessionListener, va
                 val response = handleCommand(buffer, session)
                 out.println(response.code)
                 running = !session.state.contains(SessionState.QUIT)
-                if (session.state.contains(SessionState.DATA))
+                if (session.state.contains(SessionState.DATA) && !session.delivered) {
                     listener.deliverMail(session)
+                    session.delivered = true
+                }
             }
         }
 
