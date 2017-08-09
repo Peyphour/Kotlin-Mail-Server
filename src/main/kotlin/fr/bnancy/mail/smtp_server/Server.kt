@@ -51,6 +51,7 @@ class Server {
     fun stop() {
         running = false
         clients.forEach { it.stop() }
+        this.socketServer.close()
     }
 
     fun isRunning(): Boolean {
