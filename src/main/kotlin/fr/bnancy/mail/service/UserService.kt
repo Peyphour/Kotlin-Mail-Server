@@ -17,7 +17,7 @@ class UserService {
     @Transactional
     fun createUser(username: String, password: String) {
         val encoder: BCryptPasswordEncoder = BCryptPasswordEncoder()
-        val user: User = User(0, username, encoder.encode(password), mutableSetOf(UserAuthority.ADMIN), true)
+        val user: User = User(0, username, encoder.encode(password), mutableSetOf(UserAuthority.ROLE_ADMIN), true)
         userRepository.save(user)
     }
 

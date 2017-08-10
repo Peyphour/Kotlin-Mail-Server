@@ -1,0 +1,29 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Getting Started: Serving Web Content</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+<p th:text="'Server status : ' + ${serverStatus ? 'Running' : 'Stopped'} + '!'" ></p>
+<form method="post" action="/start-server">
+    <input
+            type="hidden"
+            th:name="${_csrf.parameterName}"
+            th:value="${_csrf.token}" />
+    <button>Start server</button>
+</form>
+<form method="post" action="/stop-server">
+    <input
+            type="hidden"
+            th:name="${_csrf.parameterName}"
+            th:value="${_csrf.token}" />
+    <button>Stop server</button>
+</form>
+
+<h3>Mail addresses in the system: </h3>
+<div th:each="mail : ${mailAddresses}">
+    <span th:text="${mail}"></span><br />
+</div>
+</body>
+</html>
