@@ -7,9 +7,17 @@
 <body>
 <p th:text="'Server status : ' + ${serverStatus ? 'Running' : 'Stopped'} + '!'" ></p>
 <form method="post" action="/start-server">
+    <input
+            type="hidden"
+            th:name="${_csrf.parameterName}"
+            th:value="${_csrf.token}" />
     <button>Start server</button>
 </form>
 <form method="post" action="/stop-server">
+    <input
+            type="hidden"
+            th:name="${_csrf.parameterName}"
+            th:value="${_csrf.token}" />
     <button>Stop server</button>
 </form>
 
