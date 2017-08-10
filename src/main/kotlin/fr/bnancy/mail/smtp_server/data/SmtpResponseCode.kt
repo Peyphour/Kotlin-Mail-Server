@@ -11,8 +11,8 @@ enum class SmtpResponseCode(var code: String) {
     QUIT("221"),
     INVALID("500"),
     BAD_SEQUENCE("503"),
-    MAILBOX_UNAVAILABLE("450"),
-    SENDER_BLACKLIST("451"),
+    MAILBOX_UNAVAILABLE("550"),
+    SENDER_BLACKLIST("551"),
     ARGUMENT_ERROR("501"),
     UNKNOWN(""),
     UNKNOWN_COMMAND("550");
