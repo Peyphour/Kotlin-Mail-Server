@@ -16,17 +16,32 @@
             </tr>
         </thead>
         <tbody>
-            <tr th:each="mail : ${mails}">
+            <tr class="mail-row" th:each="mail : ${mails}">
                 <td th:text="${mail.sender}"></td>
                 <td th:each="recipient : ${mail.recipients}">
                     <span th:text="${recipient}"></span><br />
                 </td>
-                <td th:text="${mail.headers}"></td>
-                <td th:text="${mail.content}"></td>
+                <td class="mail-headers" th:text="${mail.headers}"></td>
+                <td class="mail-content" th:text="${mail.content}"></td>
             </tr>
         </tbody>
     </table>
     <script src="/js/jquery.min.js"></script>
     <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/quoted-printable.js"></script>
+
+    <script>
+        /*<![CDATA[*/
+        $(".mail-row").each(function(index, element) {
+            var headers = $(element).find(".mail-headers")
+            var jsonHeaders = JSON.parse(headers.html())
+            var html = ""
+            for(var i = 0; i < jsonHeaders.length; i++) {
+                html += jsonHeaders[i].key + " : " + jsonHeaders[i].value + " <br /> "
+            }
+            headers.html(html)
+        })
+        /*]]>*/
+    </script>
 </body>
 </html>
