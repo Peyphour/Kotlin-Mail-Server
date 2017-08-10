@@ -29,6 +29,6 @@ class AccountController {
 
         userService.createUser(username, password)
 
-        return "/index"
+        return "redirect:/"
     }
 }

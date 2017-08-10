@@ -29,13 +29,13 @@ class AdminController {
     fun startSmtpServer(): String {
         if(!smtpServer.running)
             smtpServer.start()
-        return "/admin"
+        return "redirect:/admin"
     }
 
     @RequestMapping("/stop-server", method = arrayOf(RequestMethod.POST))
     fun stopSmtpServer(): String {
         if(smtpServer.running)
             smtpServer.stop()
-        return "/admin"
+        return "redirect:/admin"
     }
 }
