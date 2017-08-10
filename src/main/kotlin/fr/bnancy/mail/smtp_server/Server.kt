@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import java.net.ServerSocket
 import java.net.Socket
+import java.net.SocketException
 import javax.annotation.PostConstruct
 
 @Component
@@ -43,7 +44,7 @@ class Server {
                 clients.add(ClientRunnable(client, listener, config.sessionTimeout, commands))
                 Thread(clients[clients.size - 1]).start()
             }
-            this.socketServer.close()
+            println("server closed")
         }).start()
 
         println("Starting SMTP server on port ${config.port}")
@@ -52,6 +53,11 @@ class Server {
     fun stop() {
         running = false
         clients.forEach { it.stop() }
+        try {
+            this.socketServer.close()
+        } catch (e: SocketException) {
+            // ignore
+        }
     }
 
     fun isRunning(): Boolean {
