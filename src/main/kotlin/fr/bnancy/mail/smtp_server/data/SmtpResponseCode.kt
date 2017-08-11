@@ -17,7 +17,7 @@ enum class SmtpResponseCode(var code: String) {
     SENDER_BLACKLIST("451"),
     NOT_AVAILABLE("454"),
     ARGUMENT_ERROR("501"),
-    UNKNOWN(""),
+    EMPTY(""),
     UNKNOWN_COMMAND("550");
 
     operator fun invoke(s: String = ""): SmtpResponseCode {

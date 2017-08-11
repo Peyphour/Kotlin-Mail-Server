@@ -31,14 +31,18 @@ class ClientRunnable(var clientSocket: Socket, val listener: SessionListener, va
 
             val line = reader.readLine()
 
-            println("RCV : $line")
-
             timeout = System.currentTimeMillis()
 
-            val response = handleCommand(line, session)
-            out.println(response.code)
+            if(line == null)
+                continue
+            println("RCV : $line")
 
-            println("SND : ${response.code}")
+            val response = handleCommand(line, session)
+
+            if(response != SmtpResponseCode.EMPTY) {
+                out.println(response.code)
+                println("SND : ${response.code}")
+            }
 
             if(session.state.contains(SessionState.TLS_STARTED) && (clientSocket !is SSLSocket)) { // Start TLS negociation
                 resetSession()
@@ -50,7 +54,6 @@ class ClientRunnable(var clientSocket: Socket, val listener: SessionListener, va
                 reader = CRLFTerminatedReader(sslSocket.inputStream)
                 out = PrintWriter(sslSocket.outputStream, true)
 
-                out.println(SmtpResponseCode.HELO("mail.bnancy.ovh ESMTP Ready").code)
                 clientSocket = sslSocket
 
                 session.secured = true
@@ -83,6 +86,8 @@ class ClientRunnable(var clientSocket: Socket, val listener: SessionListener, va
         val socket = sf.createSocket(clientSocket, remoteAddress.hostName, clientSocket.port, true) as SSLSocket
 
         socket.useClientMode = false
+
+        socket.enabledCipherSuites = socket.supportedCipherSuites
 
         socket.addHandshakeCompletedListener {
             println("handshake complete")
