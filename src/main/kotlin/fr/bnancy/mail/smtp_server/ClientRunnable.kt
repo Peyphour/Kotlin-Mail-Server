@@ -4,15 +4,13 @@ import fr.bnancy.mail.smtp_server.commands.AbstractCommand
 import fr.bnancy.mail.smtp_server.data.Session
 import fr.bnancy.mail.smtp_server.data.SessionState
 import fr.bnancy.mail.smtp_server.data.SmtpResponseCode
+import fr.bnancy.mail.smtp_server.io.CRLFTerminatedReader
 import fr.bnancy.mail.smtp_server.listeners.SessionListener
-import java.io.InputStream
 import java.io.PrintWriter
 import java.net.InetSocketAddress
 import java.net.Socket
 import javax.net.ssl.SSLSocket
 import javax.net.ssl.SSLSocketFactory
-
-
 
 class ClientRunnable(var clientSocket: Socket, val listener: SessionListener, val sessionTimeout: Int, val commands: MutableMap<String, AbstractCommand>): Runnable {
 
@@ -20,8 +18,8 @@ class ClientRunnable(var clientSocket: Socket, val listener: SessionListener, va
     val session: Session = Session()
 
     override fun run() {
-        var stream: InputStream = this.clientSocket.getInputStream()
-        var out: PrintWriter = PrintWriter(this.clientSocket.getOutputStream(), true)
+        var reader: CRLFTerminatedReader = CRLFTerminatedReader(this.clientSocket.inputStream)
+        var out: PrintWriter = PrintWriter(this.clientSocket.outputStream, true)
         var timeout: Long = System.currentTimeMillis()
 
         session.netAddress = this.clientSocket.inetAddress.hostAddress
@@ -30,42 +28,41 @@ class ClientRunnable(var clientSocket: Socket, val listener: SessionListener, va
         out.println(SmtpResponseCode.HELO("mail.bnancy.ovh ESMTP Ready").code)
 
         while(running && (System.currentTimeMillis() - timeout < sessionTimeout)) {
-            if (stream.available() > 0) {
-                val buffer: ByteArray = ByteArray(stream.available())
-                stream.read(buffer)
 
-                println("RCV : ${String(buffer)}")
+            val line = reader.readLine()
 
-                timeout = System.currentTimeMillis()
+            println("RCV : $line")
 
-                val response = handleCommand(buffer, session)
-                out.println(response.code)
+            timeout = System.currentTimeMillis()
 
-                println("SND : ${response.code}")
+            val response = handleCommand(line, session)
+            out.println(response.code)
 
-                if(session.state.contains(SessionState.TLS_STARTED) && (clientSocket !is SSLSocket)) { // Start TLS negociation
-                    resetSession()
+            println("SND : ${response.code}")
 
-                    println("creating TLS socket")
-                    val sslSocket = createTlsSocket()
-                    // Wait for handshake
-                    while(!session.state.contains(SessionState.TLS_STARTED)) {}
+            if(session.state.contains(SessionState.TLS_STARTED) && (clientSocket !is SSLSocket)) { // Start TLS negociation
+                resetSession()
 
-                    println("get streams")
-                    stream = sslSocket.inputStream
-                    out = PrintWriter(sslSocket.getOutputStream(), true)
-                    println("end of TLS part")
-                    out.println(SmtpResponseCode.HELO("mail.bnancy.ovh ESMTP Ready").code)
-                    clientSocket = sslSocket
-                }
+                val sslSocket = createTlsSocket()
+                // Wait for handshake
+                while(!session.state.contains(SessionState.TLS_STARTED)) {}
 
-                running = !session.state.contains(SessionState.QUIT)
+                reader = CRLFTerminatedReader(sslSocket.inputStream)
+                out = PrintWriter(sslSocket.outputStream, true)
 
-                if (session.state.contains(SessionState.DATA) && !session.delivered) {
-                    listener.deliverMail(session)
-                    session.delivered = true
-                }
+                out.println(SmtpResponseCode.HELO("mail.bnancy.ovh ESMTP Ready").code)
+                clientSocket = sslSocket
+
+                session.secured = true
             }
+
+            running = !session.state.contains(SessionState.QUIT)
+
+            if (session.state.contains(SessionState.DATA) && !session.delivered) {
+                listener.deliverMail(session)
+                session.delivered = true
+            }
+
         }
 
         clientSocket.close()
@@ -97,8 +94,7 @@ class ClientRunnable(var clientSocket: Socket, val listener: SessionListener, va
         return socket
     }
 
-    private fun handleCommand(buffer: ByteArray, session: Session): SmtpResponseCode {
-        val data = String(buffer)
+    private fun handleCommand(data: String, session: Session): SmtpResponseCode {
 
         val commandString = data.takeWhile { it.isLetter() }.toUpperCase()
 
