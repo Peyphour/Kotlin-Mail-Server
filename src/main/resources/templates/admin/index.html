@@ -8,22 +8,37 @@
 <p th:text="'Server status : ' + ${serverStatus ? 'Running' : 'Stopped'} + '!'" ></p>
 <form method="post" action="/admin/start-server">
     <input
-            type="hidden"
-            th:name="${_csrf.parameterName}"
-            th:value="${_csrf.token}" />
+        type="hidden"
+        th:name="${_csrf.parameterName}"
+        th:value="${_csrf.token}" />
     <button>Start server</button>
 </form>
 <form method="post" action="/admin/stop-server">
     <input
-            type="hidden"
-            th:name="${_csrf.parameterName}"
-            th:value="${_csrf.token}" />
+        type="hidden"
+        th:name="${_csrf.parameterName}"
+        th:value="${_csrf.token}" />
     <button>Stop server</button>
 </form>
 
 <h3>Mail addresses in the system: </h3>
-<div th:each="mail : ${mailAddresses}">
-    <span th:text="${mail}"></span><br />
+<div th:each="user : ${users}">
+    <span th:text="${user.mail} + ' / ' + ${user.authorities}"></span> <br />
+</div>
+<hr />
+<div>
+    <form method="post" action="/admin/register">
+        <input name="mail" type="email" />
+        <input name="pass" type="password" />
+        <select name="role">
+            <option th:each="role : ${roles}" th:value="${role}" th:text="${role}"></option>
+        </select>
+        <input
+            type="hidden"
+            th:name="${_csrf.parameterName}"
+            th:value="${_csrf.token}" />
+        <button>Create account</button>
+    </form>
 </div>
 </body>
 </html>

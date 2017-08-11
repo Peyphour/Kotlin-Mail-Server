@@ -1,5 +1,6 @@
 package fr.bnancy.mail.web.admin
 
+import fr.bnancy.mail.data.UserAuthority
 import fr.bnancy.mail.service.UserService
 import fr.bnancy.mail.smtp_server.Server
 import org.springframework.beans.factory.annotation.Autowired
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
+import org.springframework.web.bind.annotation.RequestParam
 
 @Controller
 @RequestMapping("/admin")
@@ -21,7 +23,8 @@ class AdminController {
     @RequestMapping
     fun index(model: Model): String {
         model.addAttribute("serverStatus", smtpServer.isRunning())
-        model.addAttribute("mailAddresses", userService.getAllUsers().map { it -> it.mail })
+        model.addAttribute("users", userService.getAllUsers())
+        model.addAttribute("roles", UserAuthority.values())
         return "admin/index"
     }
 
@@ -37,5 +40,10 @@ class AdminController {
         if(smtpServer.running)
             smtpServer.stop()
         return "redirect:/admin"
+    }
+
+    @RequestMapping("/account", method = arrayOf(RequestMethod.POST))
+    fun createAccount(@RequestParam("mail") mail: String, @RequestParam("pass") pass: String) {
+
     }
 }

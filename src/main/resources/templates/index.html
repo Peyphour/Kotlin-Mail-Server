@@ -6,5 +6,12 @@
 </head>
 <body>
 <p th:text="'Server status : ' + ${serverStatus ? 'Running' : 'Stopped'} + '!'" ></p>
+<form method="post" action="/logout">
+    <button>Logout</button>
+    <input
+        type="hidden"
+        th:name="${_csrf.parameterName}"
+        th:value="${_csrf.token}" />
+</form>
 </body>
 </html>
