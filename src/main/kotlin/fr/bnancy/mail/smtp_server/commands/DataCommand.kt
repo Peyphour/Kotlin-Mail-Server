@@ -16,7 +16,7 @@ class DataCommand: AbstractCommand {
             session.receivingData = true
             return SmtpResponseCode.DATA("End data with <CR><LF>.<CR><LF>")
         } else {
-            session.content += data
+            session.content += (data + "\r\n")
             if(session.content.endsWith("\r\n.\r\n")) {
                 session.content = session.content.dropLast(5) // remove CRLF.CRLF
                 session.receivingData = false
@@ -24,6 +24,6 @@ class DataCommand: AbstractCommand {
                 return SmtpResponseCode.OK("OK will deliver.")
             }
         }
-        return SmtpResponseCode.UNKNOWN() // return nothing, data reception is not finished yet
+        return SmtpResponseCode.EMPTY() // return nothing, data reception is not finished yet
     }
 }

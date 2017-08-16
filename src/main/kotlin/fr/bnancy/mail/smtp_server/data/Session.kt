@@ -12,5 +12,6 @@ data class Session(
         var senderHostname: String = "",
         var receivingData: Boolean = false,
         var receivedAt: Date = Date.from(Instant.now()),
-        var delivered: Boolean = false
+        var delivered: Boolean = false,
+        var secured: Boolean = false
 )

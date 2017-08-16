@@ -2,10 +2,12 @@ package fr.bnancy.mail.smtp_server.data
 
 enum class SmtpResponseCode(var code: String) {
     HELO("220"),
-    EHLO("250-smtp-bnancy\n" +
+    EHLO("250-mail.bnancy.ovh\n" +
             "250-SIZE 51200000\n" +
+            "250-ETRN\n" +
             "250-STARTTLS\n" +
-            "250-8BITMIME\n"),
+            "250-8BITMIME\n" +
+            "250 DSN"),
     OK("250"),
     DATA("354"),
     QUIT("221"),
@@ -13,8 +15,9 @@ enum class SmtpResponseCode(var code: String) {
     BAD_SEQUENCE("503"),
     MAILBOX_UNAVAILABLE("550"),
     SENDER_BLACKLIST("551"),
+    NOT_AVAILABLE("454"),
     ARGUMENT_ERROR("501"),
-    UNKNOWN(""),
+    EMPTY(""),
     UNKNOWN_COMMAND("550");
 
     operator fun invoke(s: String = ""): SmtpResponseCode {

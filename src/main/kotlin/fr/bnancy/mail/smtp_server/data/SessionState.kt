@@ -6,5 +6,6 @@ enum class SessionState {
     DATA,
     MAIL,
     RECIPIENT_ADDED,
-    QUIT
+    QUIT,
+    TLS_STARTED
 }
