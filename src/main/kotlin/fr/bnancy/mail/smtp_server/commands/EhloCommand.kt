@@ -8,6 +8,7 @@ import fr.bnancy.mail.smtp_server.listeners.SessionListener
 
 @Command("EHLO")
 class EhloCommand: AbstractCommand {
+
     override fun execute(data: String, session: Session, listener: SessionListener): SmtpResponseCode {
         val split = data.split(" ")
 
