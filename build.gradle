@@ -41,5 +41,6 @@ dependencies {
     compile("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
     compile ('mysql:mysql-connector-java')
     compile ('org.reflections:reflections:0.9.10')
+    compile group: 'dnsjava', name: 'dnsjava', version: '2.1.8'
     testCompile('org.springframework.boot:spring-boot-starter-test')
 }

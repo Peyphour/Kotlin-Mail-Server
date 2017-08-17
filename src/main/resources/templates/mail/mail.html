@@ -1,0 +1,62 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Getting Started: Serving Web Content</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/compat.js"></script>
+    <script src="/js/bundle.js"></script>
+    <script src="/js/download.js"></script>
+</head>
+<body>
+    <div class="mail" style="margin-left: 200px; margin-top: 100px;">
+        <div class="mail-infos">
+
+        </div>
+        <hr />
+        <div class="mail-content">
+
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        var mailAttachments = []
+
+        $(document).ready(function() {
+            var headers = JSON.parse(/*[[${mail.headers}]]*/ "");
+            var content = /*[[${mail.content}]]*/ ""
+            var fullMail = "";
+            for(var i = 0; i < headers.length; i++) {
+                fullMail += headers[i].key + ": " + headers[i].value + '\n';
+            }
+            fullMail += ('\n' + content);
+
+            window.mailParser(fullMail, function(err, mail) {
+
+                var links = "";
+
+                for(var i = 0; i < mail.attachments.length; i++) {
+                    (function (attachment) {
+                        mailAttachments["mail-attachment-" + attachment.checksum] = function() {
+                            download(attachment.content, attachment.filename, attachment.contentType)
+                        }
+                        links += "<a href='javascript:mailAttachments[\"mail-attachment-" + attachment.checksum + "\"]()'>" + attachment.filename + "</a> "
+                    })(mail.attachments[i])
+                }
+                console.log(mail)
+                $(".mail-content").html(mail.html)
+                $(".mail-infos").html("Subject : " + mail.subject + "<br />" +
+                        "From : " + mail.from.html + "<br />" +
+                        "To : " + mail.to.html + "<br />" +
+                        "Date : " + mail.date.toLocaleString() + "<br />" +
+                            "Attachments : "  + links)
+            });
+        })
+        /*]]>*/
+    </script>
+</body>
+</html>

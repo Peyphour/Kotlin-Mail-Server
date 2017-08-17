@@ -20,7 +20,7 @@ class WebSecurityConfig : WebSecurityConfigurerAdapter() {
     override fun configure(http: HttpSecurity) {
         http
             .authorizeRequests()
-                .antMatchers("/mail/**").authenticated()
+                .antMatchers("/mails/**").authenticated()
                 .antMatchers("/admin/**")
                     .hasRole("ADMIN")
                 .anyRequest().permitAll()
