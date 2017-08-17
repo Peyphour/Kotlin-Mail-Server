@@ -8,6 +8,7 @@
     <script src="/js/bootstrap.min.js"></script>
     <script src="/js/compat.js"></script>
     <script src="/js/bundle.js"></script>
+    <script src="/js/download.js"></script>
 </head>
 <body>
     <table class="table table-hover">
@@ -21,14 +22,15 @@
         </thead>
         <tbody>
             <tr class="mail-row" th:each="mail : ${mails}">
-                <td th:text="${mail.sender}"></td>
-                <td th:each="recipient : ${mail.recipients}">
-                    <span th:text="${recipient}"></span><br />
-                </td>
-                <td class="mail-headers" th:id="'mail-headers-' + ${mail.id}" th:text="${mail.headers}"></td>
+                <td th:id="'mail-from-' + ${mail.id}"></td>
+                <td th:id="'mail-to-' + ${mail.id}"></td>
+                <td class="mail-infos" th:id="'mail-infos-' + ${mail.id}"></td>
                 <td class="mail-content" th:id="'mail-content-' + ${mail.id}" th:text="${mail.content}"></td>
                 <script th:inline="javascript">
                     /*<![CDATA[*/
+
+                    var mailAttachments = []
+
                     $(document).ready(function() {
                         var headers = JSON.parse(/*[[${mail.headers}]]*/ "");
                         var content = /*[[${mail.content}]]*/ "";
@@ -40,8 +42,31 @@
                         fullMail += ('\n' + content);
 
                         window.mailParser(fullMail, function(err, mail) {
+
+                            var links = "";
+
+                            for(var i = 0; i < mail.attachments.length; i++) {
+                                (function (attachment) {
+                                    var index = /*[[${mail.id}]]*/ "";
+                                    mailAttachments["mail-attachment-" + attachment.checksum] = {
+                                        download: function() {
+                                            download(attachment.content, attachment.filename, attachment.contentType)
+                                        },
+                                        info: {
+                                            name: attachment.filename,
+                                            checksum: attachment.checksum
+                                        }
+                                    };
+                                    links += "<a href='javascript:mailAttachments[\"mail-attachment-" + attachment.checksum + "\"].download()'>" + attachment.filename + "</a><br />"
+                                })(mail.attachments[i])
+                            }
+
                             $("#mail-content-" + /*[[${mail.id}]]*/ "").html(mail.html)
-                            console.log(mail)
+                            $("#mail-from-"  + /*[[${mail.id}]]*/ "").html(mail.from.html)
+                            $("#mail-to-"  + /*[[${mail.id}]]*/ "").html(mail.to.html)
+                            $("#mail-infos-" + + /*[[${mail.id}]]*/ "").html("Subject : " + mail.subject + "<br />" +
+                                "Date : " + mail.date.toLocaleString() + "<br />" +
+                                "Attachments : "  + links)
                         });
                     })
                     /*]]>*/
