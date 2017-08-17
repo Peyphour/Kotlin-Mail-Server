@@ -104,13 +104,12 @@ class ClientRunnable(var clientSocket: Socket, val listener: SessionListener, va
         val commandString = data.takeWhile { it.isLetter() }.toUpperCase()
 
         val command: AbstractCommand? = commands[commandString]
-        if(command != null)
-            return command
+        return when {
+            session.receivingData -> commands["DATA"]!!.execute(data, session, listener)
+            command != null -> command
                     .execute(data, session, listener)
-        else if(session.receivingData)
-            return commands["DATA"]!!.execute(data, session, listener)
-        else
-            return SmtpResponseCode.UNKNOWN_COMMAND("Unknown command : $commandString")
+            else -> SmtpResponseCode.UNKNOWN_COMMAND("Unknown command : $commandString")
+        }
     }
 
     fun stop() {
