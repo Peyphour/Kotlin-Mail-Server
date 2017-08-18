@@ -42,10 +42,10 @@ class Server {
             while(running) {
                 val client: Socket = this.socketServer.accept()
                 clients.add(ClientRunnable(client, listener, configSmtp.sessionTimeout, commands))
-                Thread(clients[clients.size - 1]).start()
+                Thread(clients[clients.size - 1], "client-runnable-${client.inetAddress.hostName}").start()
             }
             println("server closed")
-        }).start()
+        }, "smtp-server").start()
 
         println("Starting SMTP server on port ${configSmtp.port}")
     }
