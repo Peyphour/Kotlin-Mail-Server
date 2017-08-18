@@ -18,8 +18,8 @@ class ClientRunnable(var clientSocket: Socket, val listener: SessionListener, va
     val session: Session = Session()
 
     override fun run() {
-        var reader: CRLFTerminatedReader = CRLFTerminatedReader(this.clientSocket.inputStream)
-        var out: PrintWriter = PrintWriter(this.clientSocket.outputStream, true)
+        var reader = CRLFTerminatedReader(this.clientSocket.inputStream)
+        var out = PrintWriter(this.clientSocket.outputStream, true)
         var timeout: Long = System.currentTimeMillis()
 
         session.netAddress = this.clientSocket.inetAddress.hostAddress
@@ -48,8 +48,6 @@ class ClientRunnable(var clientSocket: Socket, val listener: SessionListener, va
                 resetSession()
 
                 val sslSocket = createTlsSocket()
-                // Wait for handshake
-                while(!session.state.contains(SessionState.TLS_STARTED)) {}
 
                 reader = CRLFTerminatedReader(sslSocket.inputStream)
                 out = PrintWriter(sslSocket.outputStream, true)
@@ -91,7 +89,6 @@ class ClientRunnable(var clientSocket: Socket, val listener: SessionListener, va
 
         socket.addHandshakeCompletedListener {
             println("handshake complete")
-            session.state.add(SessionState.TLS_STARTED)
         }
 
         socket.startHandshake()
