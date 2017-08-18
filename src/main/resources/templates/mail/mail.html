@@ -11,7 +11,7 @@
     <script src="/js/download.js"></script>
 </head>
 <body>
-    <div class="mail" style="margin-left: 200px; margin-top: 100px;">
+    <div class="mail" style="margin-left: 200px; margin-right: 200px; margin-top: 100px;">
         <div class="mail-infos">
 
         </div>
@@ -48,11 +48,18 @@
                     })(mail.attachments[i])
                 }
                 console.log(mail)
+                var replyTo = "";
+                if(mail.hasOwnProperty("replyTo")) {
+                    replyTo = mail.replyTo.html
+                } else {
+                    replyTo = mail.from.html
+                }
                 $(".mail-content").html(mail.html)
                 $(".mail-infos").html("Subject : " + mail.subject + "<br />" +
                         "From : " + mail.from.html + "<br />" +
                         "To : " + mail.to.html + "<br />" +
                         "Date : " + mail.date.toLocaleString() + "<br />" +
+                        "Reply to: " + replyTo + "<br />" +
                             "Attachments : "  + links)
             });
         })
