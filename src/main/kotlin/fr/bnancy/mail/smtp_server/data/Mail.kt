@@ -1,7 +1,7 @@
 package fr.bnancy.mail.smtp_server.data
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import fr.bnancy.mail.smtp_server.data.entities.Mail
+import fr.bnancy.mail.data.Mail
 
 class Mail(session: Session) {
 
