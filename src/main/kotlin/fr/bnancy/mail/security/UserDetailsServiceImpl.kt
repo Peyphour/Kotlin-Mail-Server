@@ -24,7 +24,7 @@ class UserDetailsServiceImpl: UserDetailsService {
         return UserDetailsImpl(User(0, ", ", "", mutableSetOf(), false))
     }
 
-    class UserDetailsImpl(val user: User) : UserDetails {
+    class UserDetailsImpl(private val user: User) : UserDetails {
         override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
             return user.authorities.map { GrantedAuthority { it.name} }.toMutableList()
         }

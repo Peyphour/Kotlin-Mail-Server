@@ -29,7 +29,7 @@ class Server {
 
     @PostConstruct
     fun init() {
-        val reflections: Reflections = Reflections("fr.bnancy.mail.smtp_server.commands")
+        val reflections = Reflections("fr.bnancy.mail.smtp_server.commands")
         for (classz in reflections.getTypesAnnotatedWith(Command::class.java)) {
             commands.put(classz.getAnnotation(Command::class.java).command, classz.newInstance() as AbstractCommand)
         }

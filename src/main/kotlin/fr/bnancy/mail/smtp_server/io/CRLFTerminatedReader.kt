@@ -66,14 +66,13 @@ class CRLFTerminatedReader(
     }
 
     inner class MaxLineLengthException : IOException {
-        constructor() : super() {}
+        constructor() : super()
 
-        constructor(s: String) : super(s) {}
+        constructor(s: String) : super(s)
     }
 
     @Throws(UnsupportedEncodingException::class)
-    constructor(`in`: InputStream, enc: String) : this(`in`) {
-    }
+    constructor(`in`: InputStream, enc: String) : this(`in`)
 
     private val lineBuffer = StringBuffer()
     private val EOF = -1
@@ -175,7 +174,7 @@ class CRLFTerminatedReader(
     override fun read(cbuf: CharArray, off: Int, len: Int): Int {
         val temp = ByteArray(len)
         val result = this.`in`.read(temp, 0, len)
-        for (i in 0..result - 1)
+        for (i in 0 until result)
             cbuf[i] = temp[i].toChar()
         return result
     }

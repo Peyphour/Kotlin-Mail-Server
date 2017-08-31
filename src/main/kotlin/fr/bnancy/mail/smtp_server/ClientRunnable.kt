@@ -12,9 +12,9 @@ import java.net.Socket
 import javax.net.ssl.SSLSocket
 import javax.net.ssl.SSLSocketFactory
 
-class ClientRunnable(var clientSocket: Socket, val listener: SessionListener, val sessionTimeout: Int, val commands: MutableMap<String, AbstractCommand>): Runnable {
+class ClientRunnable(private var clientSocket: Socket, val listener: SessionListener, private val sessionTimeout: Int, val commands: MutableMap<String, AbstractCommand>): Runnable {
 
-    var running: Boolean = true
+    private var running: Boolean = true
     val session: Session = Session()
 
     override fun run() {

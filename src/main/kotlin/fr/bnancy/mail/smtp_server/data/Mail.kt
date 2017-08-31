@@ -5,17 +5,17 @@ import fr.bnancy.mail.data.Mail
 
 class Mail(session: Session) {
 
-    val sender = session.from
-    val recipients = session.to
-    val headers = parseHeaders(session.content)
+    private val sender = session.from
+    private val recipients = session.to
+    private val headers = parseHeaders(session.content)
     val content = parseContent(session.content)
-    val date = session.receivedAt
-    val secured = session.secured
+    private val date = session.receivedAt
+    private val secured = session.secured
 
     private fun parseHeaders(content: String): String {
         val headers: MutableList<Header> = ArrayList()
         for (line: String in content.lines()) {
-            val header: Header = Header("", "")
+            val header = Header("", "")
             if (line.isEmpty()) // No header: end of header section
                 break
             if (line.indexOf(':') >= 0 && line[0].isLetterOrDigit()) { // Header key present
