@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component
 import java.net.ServerSocket
 import java.net.Socket
 import java.net.SocketException
+import java.util.logging.Logger
 import javax.annotation.PostConstruct
 
 @Component
@@ -23,6 +24,9 @@ class Server {
     lateinit var listener: SessionListener
 
     lateinit var socketServer: ServerSocket
+
+    private val logger = Logger.getLogger(javaClass.simpleName)
+
     var running: Boolean = false
     val clients: ArrayList<ClientRunnable> = ArrayList()
 
@@ -48,7 +52,7 @@ class Server {
             println("server closed")
         }, "smtp-server").start()
 
-        println("Starting SMTP server on port ${configSmtp.port}")
+        logger.info("Starting SMTP server on port ${configSmtp.port}")
     }
 
     fun stop() {
@@ -67,6 +71,7 @@ class Server {
 
     @Scheduled(fixedDelay = 1000 * 60 * 60, initialDelay = 1000 * 60 * 60) // One call per hour
     fun cleanupHangingClients() {
+        logger.info("Starting to clean threads")
         if(!this.running)
             return
         this.stop()

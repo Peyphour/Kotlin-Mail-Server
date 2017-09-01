@@ -11,4 +11,3 @@ class MailApplication
 fun main(args: Array<String>) {
     SpringApplication.run(MailApplication::class.java, *args)
 }
-

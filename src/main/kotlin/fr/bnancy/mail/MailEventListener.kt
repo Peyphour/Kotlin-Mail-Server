@@ -2,11 +2,14 @@ package fr.bnancy.mail
 
 import fr.bnancy.mail.repository.MailRepository
 import fr.bnancy.mail.repository.UserRepository
+import fr.bnancy.mail.service.IpBlacklistService
 import fr.bnancy.mail.smtp_server.data.Mail
 import fr.bnancy.mail.smtp_server.data.Session
+import fr.bnancy.mail.smtp_server.data.SessionState
 import fr.bnancy.mail.smtp_server.listeners.SessionListener
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
+import java.util.logging.Logger
 
 @Component
 class MailEventListener: SessionListener {
@@ -16,6 +19,11 @@ class MailEventListener: SessionListener {
 
     @Autowired
     private lateinit var userRepository: UserRepository
+
+    @Autowired
+    private lateinit var ipBlacklistService: IpBlacklistService
+
+    private val logger = Logger.getLogger(javaClass.simpleName)
 
     override fun acceptSender(address: String): Boolean {
         return true
@@ -30,7 +38,9 @@ class MailEventListener: SessionListener {
     }
 
     override fun sessionOpened(session: Session) {
-        println(session)
+        logger.info(session.toString())
+        if(ipBlacklistService.blacklistedIp(session.netAddress))
+            session.state.add(SessionState.QUIT)
     }
 
     override fun sessionClosed(session: Session) {
