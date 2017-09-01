@@ -1,4 +1,4 @@
-package fr.bnancy.mail.smtp_server.commands.annotations
+package fr.bnancy.mail.servers.smtp.commands.annotations
 
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)

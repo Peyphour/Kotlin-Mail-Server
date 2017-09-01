@@ -1,4 +1,4 @@
-package fr.bnancy.mail.smtp_server.data
+package fr.bnancy.mail.servers.smtp.data
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import fr.bnancy.mail.data.Mail

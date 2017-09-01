@@ -1,6 +1,6 @@
 package fr.bnancy.mail.web
 
-import fr.bnancy.mail.smtp_server.Server
+import fr.bnancy.mail.servers.smtp.SmtpServer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 class HomeController {
 
     @Autowired
-    lateinit var smtpServer: Server
+    lateinit var smtpServer: SmtpServer
 
     @RequestMapping
     fun index(model: Model): String {

@@ -2,9 +2,9 @@ package fr.bnancy.mail
 
 import fr.bnancy.mail.repository.MailRepository
 import fr.bnancy.mail.repository.UserRepository
-import fr.bnancy.mail.smtp_server.data.Mail
-import fr.bnancy.mail.smtp_server.data.Session
-import fr.bnancy.mail.smtp_server.listeners.SessionListener
+import fr.bnancy.mail.servers.smtp.data.Mail
+import fr.bnancy.mail.servers.smtp.data.Session
+import fr.bnancy.mail.servers.smtp.listeners.SessionListener
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 

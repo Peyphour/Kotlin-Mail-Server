@@ -1,4 +1,4 @@
-package fr.bnancy.mail.smtp_server.data
+package fr.bnancy.mail.servers.smtp.data
 
 import java.time.Instant
 import java.util.*

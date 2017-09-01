@@ -1,9 +1,9 @@
-package fr.bnancy.mail.smtp_server
+package fr.bnancy.mail.servers.smtp
 
 import fr.bnancy.mail.config.SmtpServerConfig
-import fr.bnancy.mail.smtp_server.commands.AbstractCommand
-import fr.bnancy.mail.smtp_server.commands.annotations.Command
-import fr.bnancy.mail.smtp_server.listeners.SessionListener
+import fr.bnancy.mail.servers.smtp.commands.AbstractCommand
+import fr.bnancy.mail.servers.smtp.commands.annotations.Command
+import fr.bnancy.mail.servers.smtp.listeners.SessionListener
 import org.reflections.Reflections
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.scheduling.annotation.Scheduled
@@ -14,7 +14,7 @@ import java.net.SocketException
 import javax.annotation.PostConstruct
 
 @Component
-class Server {
+class SmtpServer {
 
     @Autowired
     lateinit var configSmtp: SmtpServerConfig
@@ -24,13 +24,13 @@ class Server {
 
     lateinit var socketServer: ServerSocket
     var running: Boolean = false
-    val clients: ArrayList<ClientRunnable> = ArrayList()
+    val clients: ArrayList<SmtpClientRunnable> = ArrayList()
 
     val commands: MutableMap<String, AbstractCommand> = HashMap()
 
     @PostConstruct
     fun init() {
-        val reflections = Reflections("fr.bnancy.mail.smtp_server.commands")
+        val reflections = Reflections("fr.bnancy.mail.servers.smtp.commands")
         for (classz in reflections.getTypesAnnotatedWith(Command::class.java)) {
             commands.put(classz.getAnnotation(Command::class.java).command, classz.newInstance() as AbstractCommand)
         }
@@ -42,7 +42,7 @@ class Server {
         Thread({
             while(running) {
                 val client: Socket = this.socketServer.accept()
-                clients.add(ClientRunnable(client, listener, configSmtp.sessionTimeout, commands))
+                clients.add(SmtpClientRunnable(client, listener, configSmtp.sessionTimeout, commands))
                 Thread(clients[clients.size - 1], "client-runnable-${client.inetAddress.hostName}").start()
             }
             println("server closed")
