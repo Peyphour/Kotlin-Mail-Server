@@ -6,6 +6,7 @@ import fr.bnancy.mail.smtp_server.commands.annotations.Command
 import fr.bnancy.mail.smtp_server.listeners.SessionListener
 import org.reflections.Reflections
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import java.net.ServerSocket
 import java.net.Socket
@@ -62,6 +63,16 @@ class Server {
 
     fun isRunning(): Boolean {
         return running
+    }
+
+    @Scheduled(fixedDelay = 1000 * 60 * 60, initialDelay = 1000 * 60 * 60) // One call per hour
+    fun cleanupHangingClients() {
+        if(!this.running)
+            return
+        this.stop()
+        Thread.sleep(1000)
+        this.clients.clear()
+        this.start()
     }
 }
 
