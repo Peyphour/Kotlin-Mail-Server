@@ -2,6 +2,10 @@ smtp:
   port: 25
   sessionTimeout: 60000
 
+imap:
+   port: 25000
+   sessionTimeout: 60000
+
 spring:
   datasource:
     url: jdbc:mysql://localhost:3306/mail

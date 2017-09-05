@@ -1,6 +1,7 @@
 package fr.bnancy.mail.servers.smtp
 
 import fr.bnancy.mail.config.SmtpServerConfig
+import fr.bnancy.mail.servers.AbstractServer
 import fr.bnancy.mail.servers.smtp.commands.AbstractCommand
 import fr.bnancy.mail.servers.smtp.commands.annotations.Command
 import fr.bnancy.mail.servers.smtp.listeners.SessionListener
@@ -14,7 +15,7 @@ import java.net.SocketException
 import javax.annotation.PostConstruct
 
 @Component
-class SmtpServer {
+class SmtpServer : AbstractServer {
 
     @Autowired
     lateinit var configSmtp: SmtpServerConfig
@@ -36,7 +37,7 @@ class SmtpServer {
         }
     }
 
-    fun start() {
+    override fun start() {
         this.running = true
         this.socketServer = ServerSocket(this.configSmtp.port)
         Thread({
@@ -51,7 +52,7 @@ class SmtpServer {
         println("Starting SMTP server on port ${configSmtp.port}")
     }
 
-    fun stop() {
+    override fun stop() {
         running = false
         clients.forEach { it.stop() }
         try {

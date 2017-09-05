@@ -1,13 +1,15 @@
 package fr.bnancy.mail.servers.imap
 
 import fr.bnancy.mail.config.ImapServerConfig
+import fr.bnancy.mail.servers.AbstractServer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import java.net.ServerSocket
 import javax.net.ssl.SSLServerSocketFactory
+import javax.net.ssl.SSLSocket
 
 @Component
-class ImapServer {
+class ImapServer : AbstractServer {
 
     @Autowired
     lateinit var configImap: ImapServerConfig
@@ -17,7 +19,7 @@ class ImapServer {
     var running: Boolean = false
     val clients: ArrayList<ImapClientRunnable> = ArrayList()
 
-    fun start() {
+    override fun start() {
         this.running = true
         this.socketServer = SSLServerSocketFactory
                 .getDefault()
@@ -25,11 +27,13 @@ class ImapServer {
         Thread({
             while(running) {
                 val client = this.socketServer.accept()
+                clients.add(ImapClientRunnable(client as SSLSocket))
+                Thread(clients[clients.size - 1]).start()
             }
         }, "imap-server").start()
     }
 
-    fun stop() {
+    override fun stop() {
         this.running = false
     }
 }
