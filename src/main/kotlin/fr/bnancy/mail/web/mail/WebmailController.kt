@@ -7,6 +7,7 @@ import org.springframework.security.core.Authentication
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 
@@ -26,9 +27,9 @@ class WebmailController {
         return "mail/index"
     }
 
-    @RequestMapping("/mail")
-    fun getMail(model: Model, auth: Authentication, @RequestParam mailId: Long): String {
-        val mail = mailRepository.findOne(mailId)
+    @RequestMapping("/{id}")
+    fun getMail(model: Model, auth: Authentication, @PathVariable id: Long): String {
+        val mail = mailRepository.findOne(id)
         val userEmail = (auth.principal as UserDetails).username
         if(mail == null ||  !mail.recipients.contains(userEmail)) {
             return "redirect:/mails"
