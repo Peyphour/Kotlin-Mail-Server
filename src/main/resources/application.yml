@@ -3,7 +3,7 @@ smtp:
   sessionTimeout: 60000
 
 imap:
-   port: 25000
+   port: 993
    sessionTimeout: 60000
 
 spring:

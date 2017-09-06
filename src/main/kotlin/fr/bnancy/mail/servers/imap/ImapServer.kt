@@ -26,11 +26,13 @@ class ImapServer : AbstractServer {
                 .createServerSocket(this.configImap.port)
         Thread({
             while(running) {
-                val client = this.socketServer.accept()
-                clients.add(ImapClientRunnable(client as SSLSocket))
+                val client = this.socketServer.accept() as SSLSocket
+                client.enabledCipherSuites = client.supportedCipherSuites
+                clients.add(ImapClientRunnable(client))
                 Thread(clients[clients.size - 1]).start()
             }
         }, "imap-server").start()
+        println("Starting IMAP server on port ${configImap.port}")
     }
 
     override fun stop() {
