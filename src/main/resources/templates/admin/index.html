@@ -1,44 +1,112 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Getting Started: Serving Web Content</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-</head>
-<body>
-<p th:text="'Server status : ' + ${serverStatus ? 'Running' : 'Stopped'} + '!'" ></p>
-<form method="post" action="/admin/start-server">
-    <input
-        type="hidden"
-        th:name="${_csrf.parameterName}"
-        th:value="${_csrf.token}" />
-    <button>Start server</button>
-</form>
-<form method="post" action="/admin/stop-server">
-    <input
-        type="hidden"
-        th:name="${_csrf.parameterName}"
-        th:value="${_csrf.token}" />
-    <button>Stop server</button>
-</form>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content=""/>
+    <meta name="author" content=""/>
 
-<h3>Mail addresses in the system: </h3>
-<div th:each="user : ${users}">
-    <span th:text="${user.mail} + ' / ' + ${user.authorities}"></span> <br />
-</div>
-<hr />
-<div>
-    <form method="post" action="/admin/register">
-        <input name="mail" type="email" />
-        <input name="pass" type="password" />
-        <select name="role">
-            <option th:each="role : ${roles}" th:value="${role}" th:text="${role}"></option>
-        </select>
-        <input
-            type="hidden"
-            th:name="${_csrf.parameterName}"
-            th:value="${_csrf.token}" />
-        <button>Create account</button>
-    </form>
-</div>
+    <title>Starter Template for Bootstrap</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet"/>
+
+    <style>
+        .starter-template {
+            margin-top: 100px;
+        }
+    </style>
+
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/compat.js"></script>
+    <script src="/js/bundle.js"></script>
+    <script src="/js/download.js"></script>
+</head>
+
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Mail Server</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="/">Home</a></li>
+                <li><a href="/mails">Webmail</a></li>
+                <li class="active"><a href="/admin">Admin</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/login">Login</a></li>
+                <li>
+                    <form method="post" action="/logout"><input type="hidden" th:name="${_csrf.parameterName}"
+                                                                th:value="${_csrf.token}"/>
+                        <button class="btn-link" style="text-decoration: none;margin-top: 20%;">Logout</button>
+                    </form>
+                </li>
+            </ul>
+        </div><!--/.nav-collapse -->
+    </div>
+</nav>
+
+<div class="container">
+
+    <div class="starter-template">
+        <p th:class="'bg-' + ${serverStatus ? 'success' : 'danger'}"
+           th:text="'Server status : ' + ${serverStatus ? 'Running' : 'Stopped'} + '!'"></p>
+        <form method="post" action="/admin/start-server">
+            <input
+                    type="hidden"
+                    th:name="${_csrf.parameterName}"
+                    th:value="${_csrf.token}"/>
+            <button>Start server</button>
+        </form>
+        <form method="post" action="/admin/stop-server">
+            <input
+                    type="hidden"
+                    th:name="${_csrf.parameterName}"
+                    th:value="${_csrf.token}"/>
+            <button>Stop server</button>
+        </form>
+
+        <h3>Mail addresses in the system: </h3>
+        <div th:each="user : ${users}">
+            <span th:text="${user.mail} + ' / ' + ${user.authorities}"></span> <br/>
+        </div>
+        <hr/>
+        <div>
+            <form method="post" action="/admin/register">
+                <input name="mail" type="email"/>
+                <input name="pass" type="password"/>
+                <select name="role">
+                    <option th:each="role : ${roles}" th:value="${role}" th:text="${role}"></option>
+                </select>
+                <input
+                        type="hidden"
+                        th:name="${_csrf.parameterName}"
+                        th:value="${_csrf.token}"/>
+                <button>Create account</button>
+            </form>
+        </div>
+    </div>
+
+</div><!-- /.container -->
+
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
 </body>
 </html>
