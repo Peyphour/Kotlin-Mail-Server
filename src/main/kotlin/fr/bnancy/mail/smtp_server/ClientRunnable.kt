@@ -17,6 +17,8 @@ class ClientRunnable(private var clientSocket: Socket, val listener: SessionList
     private var running: Boolean = true
     val session: Session = Session()
 
+    private val lineSeparator = "\r\n"
+
     override fun run() {
         var reader = CRLFTerminatedReader(this.clientSocket.inputStream)
         var out = PrintWriter(this.clientSocket.outputStream, true)
@@ -25,7 +27,7 @@ class ClientRunnable(private var clientSocket: Socket, val listener: SessionList
         session.netAddress = this.clientSocket.inetAddress.hostAddress
         listener.sessionOpened(session)
 
-        out.println(SmtpResponseCode.HELO("mail.bnancy.ovh ESMTP Ready").code)
+        write(out, SmtpResponseCode.HELO("mail.bnancy.ovh ESMTP Ready").code)
 
         while(running && (System.currentTimeMillis() - timeout < sessionTimeout)) {
 
@@ -33,18 +35,19 @@ class ClientRunnable(private var clientSocket: Socket, val listener: SessionList
 
             timeout = System.currentTimeMillis()
 
-            if(line == null)
-                continue
+            if(line == null) { // Received EOF
+                break
+            }
             println("RCV : $line")
 
             val response = handleCommand(line, session)
 
             if(response != SmtpResponseCode.EMPTY) {
-                out.println(response.code)
+                write(out, response.code)
                 println("SND : ${response.code}")
             }
 
-            if(session.state.contains(SessionState.TLS_STARTED) && (clientSocket !is SSLSocket)) { // Start TLS negociation
+            if(session.state.contains(SessionState.TLS_STARTED) && (clientSocket !is SSLSocket)) { // Start TLS negotiation
                 resetSession()
 
                 val sslSocket = createTlsSocket()
@@ -68,6 +71,12 @@ class ClientRunnable(private var clientSocket: Socket, val listener: SessionList
 
         clientSocket.close()
         listener.sessionClosed(session)
+    }
+
+    private fun write(out: PrintWriter, s: String) {
+        out.write(s)
+        out.write(lineSeparator)
+        out.flush()
     }
 
     private fun resetSession() {

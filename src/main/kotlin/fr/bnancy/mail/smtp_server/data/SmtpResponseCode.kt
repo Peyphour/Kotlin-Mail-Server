@@ -2,11 +2,11 @@ package fr.bnancy.mail.smtp_server.data
 
 enum class SmtpResponseCode(var code: String) {
     HELO("220"),
-    EHLO("250-mail.bnancy.ovh\n" +
-            "250-SIZE 51200000\n" +
-            "250-ETRN\n" +
-            "250-STARTTLS\n" +
-            "250-8BITMIME\n" +
+    EHLO("250-mail.bnancy.ovh\r\n" +
+            "250-SIZE 51200000\r\n" +
+            "250-ETRN\r\n" +
+            "250-STARTTLS\r\n" +
+            "250-8BITMIME\r\n" +
             "250 DSN"),
     OK("250"),
     DATA("354"),
