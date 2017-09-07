@@ -1,6 +1,7 @@
 package fr.bnancy.mail.smtp_server
 
 import fr.bnancy.mail.smtp_server.commands.AbstractCommand
+import fr.bnancy.mail.smtp_server.data.LoginState
 import fr.bnancy.mail.smtp_server.data.Session
 import fr.bnancy.mail.smtp_server.data.SessionState
 import fr.bnancy.mail.smtp_server.data.SmtpResponseCode
@@ -112,6 +113,7 @@ class ClientRunnable(private var clientSocket: Socket, val listener: SessionList
         val command: AbstractCommand? = commands[commandString]
         return when {
             session.receivingData -> commands["DATA"]!!.execute(data, session, listener)
+            session.loginState.contains(LoginState.LOGIN_IN_PROGRESS) -> commands["AUTH"]!!.execute(data, session, listener)
             command != null -> command
                     .execute(data, session, listener)
             else -> SmtpResponseCode.UNKNOWN_COMMAND("Unknown command : $commandString")
