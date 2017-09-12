@@ -47,14 +47,13 @@
                         links += "<a href='javascript:mailAttachments[\"mail-attachment-" + attachment.checksum + "\"]()'>" + attachment.filename + "</a> "
                     })(mail.attachments[i])
                 }
-                console.log(mail)
                 var replyTo = "";
                 if(mail.hasOwnProperty("replyTo")) {
                     replyTo = mail.replyTo.html
                 } else {
                     replyTo = mail.from.html
                 }
-                $(".mail-content").html(mail.html)
+                $(".mail-content").html(mail.html ? mail.html : mail.textAsHtml)
                 $(".mail-infos").html("Subject : " + mail.subject + "<br />" +
                         "From : " + mail.from.html + "<br />" +
                         "To : " + mail.to.html + "<br />" +
