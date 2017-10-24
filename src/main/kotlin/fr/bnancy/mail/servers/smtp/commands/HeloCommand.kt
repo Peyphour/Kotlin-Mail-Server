@@ -1,10 +1,10 @@
-package fr.bnancy.mail.smtp_server.commands
+package fr.bnancy.mail.servers.smtp.commands
 
-import fr.bnancy.mail.smtp_server.commands.annotations.Command
-import fr.bnancy.mail.smtp_server.data.Session
-import fr.bnancy.mail.smtp_server.data.SessionState
-import fr.bnancy.mail.smtp_server.data.SmtpResponseCode
-import fr.bnancy.mail.smtp_server.listeners.SessionListener
+import fr.bnancy.mail.servers.smtp.commands.annotations.Command
+import fr.bnancy.mail.servers.smtp.data.Session
+import fr.bnancy.mail.servers.smtp.data.SessionState
+import fr.bnancy.mail.servers.smtp.data.SmtpResponseCode
+import fr.bnancy.mail.servers.smtp.listeners.SessionListener
 
 @Command("HELO")
 class HeloCommand: AbstractCommand {

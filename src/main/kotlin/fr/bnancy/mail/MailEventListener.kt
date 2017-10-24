@@ -1,13 +1,11 @@
 package fr.bnancy.mail
 
-import fr.bnancy.mail.repository.MailRepository
 import fr.bnancy.mail.repository.UserRepository
+import fr.bnancy.mail.servers.smtp.data.Session
+import fr.bnancy.mail.servers.smtp.listeners.SessionListener
 import fr.bnancy.mail.service.IpBlacklistService
+import fr.bnancy.mail.service.MailDeliveryService
 import fr.bnancy.mail.service.UserService
-import fr.bnancy.mail.smtp_server.data.Mail
-import fr.bnancy.mail.smtp_server.data.Session
-import fr.bnancy.mail.smtp_server.data.SessionState
-import fr.bnancy.mail.smtp_server.listeners.SessionListener
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import java.util.logging.Logger
@@ -16,7 +14,7 @@ import java.util.logging.Logger
 class MailEventListener: SessionListener {
 
     @Autowired
-    private lateinit var mailRepository: MailRepository
+    private lateinit var mailDeliveryService: MailDeliveryService
 
     @Autowired
     private lateinit var userRepository: UserRepository
@@ -34,17 +32,19 @@ class MailEventListener: SessionListener {
     }
 
     override fun deliverMail(session: Session) {
-        mailRepository.save(Mail(session).toEntity())
+        mailDeliveryService.queueDelivery(session)
     }
 
-    override fun acceptRecipient(recipientAddress: String): Boolean {
-        return userRepository.findByMail(recipientAddress) != null
+    override fun acceptRecipient(recipientAddress: String, session: Session): Boolean {
+        if(!session.authenticated)
+            return userRepository.findByMail(recipientAddress) != null
+        return true
     }
 
     override fun sessionOpened(session: Session) {
         logger.info(session.toString())
-//        if(ipBlacklistService.blacklistedIp(session.netAddress))
-//            session.state.add(SessionState.QUIT)
+        if(ipBlacklistService.blacklistedIp(session.netAddress))
+            session.state.add(SessionState.QUIT)
     }
 
     override fun sessionClosed(session: Session) {
