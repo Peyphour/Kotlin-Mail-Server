@@ -2,6 +2,7 @@ package fr.bnancy.mail
 
 import fr.bnancy.mail.repository.UserRepository
 import fr.bnancy.mail.servers.smtp.data.Session
+import fr.bnancy.mail.servers.smtp.data.SessionState
 import fr.bnancy.mail.servers.smtp.listeners.SessionListener
 import fr.bnancy.mail.service.IpBlacklistService
 import fr.bnancy.mail.service.MailDeliveryService
