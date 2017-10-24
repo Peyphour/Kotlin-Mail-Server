@@ -29,11 +29,11 @@ class AuthCommand : AbstractCommand {
         } else if(session.loginState.contains(LoginState.USERNAME_TRANSMITTED)
                 && !session.loginState.contains(LoginState.PASSWORD_TRANSMITTED)
                 && session.loginUsername.isEmpty()) {
-            session.loginUsername = Base64.getDecoder().decode(data.dropLast(2)).toString(Charset.forName("UTF-8"))
+            session.loginUsername = Base64.getDecoder().decode(data).toString(Charset.forName("UTF-8"))
             session.loginState.add(LoginState.PASSWORD_TRANSMITTED)
             return SmtpResponseCode.AUTH_GO_ON("UGFzc3dvcmQ6")
         } else if (session.loginState.contains(LoginState.USERNAME_TRANSMITTED) && session.loginState.contains(LoginState.PASSWORD_TRANSMITTED)) {
-            val password = Base64.getDecoder().decode(data.dropLast(2)).toString(Charset.forName("UTF-8"))
+            val password = Base64.getDecoder().decode(data).toString(Charset.forName("UTF-8"))
             session.loginState.clear()
             return if(listener.isValidUser(session, password))
                 SmtpResponseCode.AUTH_OK("Welcome back ${session.loginUsername}")

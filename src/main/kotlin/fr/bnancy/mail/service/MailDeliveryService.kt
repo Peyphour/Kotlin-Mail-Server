@@ -47,10 +47,10 @@ class MailDeliveryService {
 
         val mail = Mail(session).toEntity()
 
-        val email = Email()
-        email.setFromAddress(mail.sender, mail.sender)
-        email.setReplyToAddress(mail.sender, mail.sender)
         for(recipient in mail.recipients) {
+            val email = Email()
+            email.setFromAddress(mail.sender, mail.sender)
+            email.setReplyToAddress(mail.sender, mail.sender)
             email.addRecipient(recipient, recipient, Message.RecipientType.TO)
             val headers: Array<Header> = jacksonObjectMapper().readValue(mail.headers)
 
