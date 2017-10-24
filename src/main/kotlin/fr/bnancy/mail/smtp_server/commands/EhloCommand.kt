@@ -19,7 +19,17 @@ class EhloCommand: AbstractCommand {
 
         session.state.add(SessionState.HELO)
 
-        return SmtpResponseCode.EHLO
+        val options = "250-SIZE 51200000\r\n" +
+                "250-ETRN\r\n" +
+                "250-STARTTLS\r\n" +
+                "250-8BITMIME\r\n" +
+                when {
+                    session.secured -> "250-AUTH PLAIN\r\n"
+                    else -> ""
+                } +
+                "250 DSN"
+
+        return SmtpResponseCode.EHLO(options)
     }
 
 }

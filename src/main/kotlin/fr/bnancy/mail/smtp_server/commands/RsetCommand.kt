@@ -10,6 +10,7 @@ class RsetCommand: AbstractCommand {
     override fun execute(data: String, session: Session, listener: SessionListener): SmtpResponseCode {
 
         session.state = ArrayList()
+        session.loginState = ArrayList()
         session.to = ArrayList()
         session.from = ""
         session.content = ""

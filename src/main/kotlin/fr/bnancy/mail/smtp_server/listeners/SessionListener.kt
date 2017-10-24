@@ -7,5 +7,6 @@ interface SessionListener {
     fun sessionClosed(session: Session)
     fun deliverMail(session: Session)
     fun acceptRecipient(recipientAddress: String): Boolean
-    fun  acceptSender(address: String): Boolean
+    fun acceptSender(address: String): Boolean
+    fun isValidUser(session: Session, password: String): Boolean
 }
