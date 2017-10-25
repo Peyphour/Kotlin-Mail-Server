@@ -6,7 +6,6 @@ import fr.bnancy.mail.service.IpBlacklistService
 import fr.bnancy.mail.service.UserService
 import fr.bnancy.mail.smtp_server.data.Mail
 import fr.bnancy.mail.smtp_server.data.Session
-import fr.bnancy.mail.smtp_server.data.SessionState
 import fr.bnancy.mail.smtp_server.listeners.SessionListener
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component

@@ -1,5 +1,6 @@
 package fr.bnancy.mail.smtp_server
 
+import fr.bnancy.mail.getHostname
 import fr.bnancy.mail.smtp_server.commands.AbstractCommand
 import fr.bnancy.mail.smtp_server.data.LoginState
 import fr.bnancy.mail.smtp_server.data.Session
@@ -28,7 +29,7 @@ class ClientRunnable(private var clientSocket: Socket, val listener: SessionList
         session.netAddress = this.clientSocket.inetAddress.hostAddress
         listener.sessionOpened(session)
 
-        write(out, SmtpResponseCode.HELO("mail.bnancy.ovh ESMTP Ready").code)
+        write(out, SmtpResponseCode.HELO("${getHostname()} ESMTP Ready").code)
 
         while(running && (System.currentTimeMillis() - timeout < sessionTimeout)) {
 
