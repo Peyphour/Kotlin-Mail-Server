@@ -24,7 +24,7 @@ class EhloCommand: AbstractCommand {
                 "250-STARTTLS\r\n" +
                 "250-8BITMIME\r\n" +
                 when {
-                    session.secured -> "250-AUTH PLAIN\r\n"
+                    session.secured -> "250-AUTH LOGIN\r\n"
                     else -> ""
                 } +
                 "250 DSN"
