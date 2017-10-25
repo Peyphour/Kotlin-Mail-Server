@@ -67,6 +67,7 @@ class ClientRunnable(private var clientSocket: Socket, val listener: SessionList
             if (session.state.contains(SessionState.DATA) && !session.delivered) {
                 listener.deliverMail(session)
                 session.delivered = true
+                resetSession()
             }
 
         }
@@ -87,6 +88,7 @@ class ClientRunnable(private var clientSocket: Socket, val listener: SessionList
         session.from = ""
         session.content = ""
         session.receivingData = false
+        session.delivered = false
     }
 
     private fun createTlsSocket(): SSLSocket {
