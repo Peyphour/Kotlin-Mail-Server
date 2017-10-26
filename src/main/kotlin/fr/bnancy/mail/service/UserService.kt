@@ -24,4 +24,9 @@ class UserService {
     fun getAllUsers(): MutableIterable<User> {
         return userRepository.findAll()
     }
+
+    fun isValidUser(username: String, password: String): Boolean {
+        val user = userRepository.findByMail(username)
+        return user != null && BCryptPasswordEncoder().matches(password, user.password)
+    }
 }

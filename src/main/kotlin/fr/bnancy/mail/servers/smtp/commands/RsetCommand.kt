@@ -1,15 +1,16 @@
-package fr.bnancy.mail.servers.smtp.commands
+package fr.bnancy.mail.smtp_server.commands
 
-import fr.bnancy.mail.servers.smtp.commands.annotations.Command
-import fr.bnancy.mail.servers.smtp.data.Session
-import fr.bnancy.mail.servers.smtp.data.SmtpResponseCode
-import fr.bnancy.mail.servers.smtp.listeners.SessionListener
+import fr.bnancy.mail.smtp_server.commands.annotations.Command
+import fr.bnancy.mail.smtp_server.data.Session
+import fr.bnancy.mail.smtp_server.data.SmtpResponseCode
+import fr.bnancy.mail.smtp_server.listeners.SessionListener
 
 @Command("RSET")
 class RsetCommand: AbstractCommand {
     override fun execute(data: String, session: Session, listener: SessionListener): SmtpResponseCode {
 
         session.state = ArrayList()
+        session.loginState = ArrayList()
         session.to = ArrayList()
         session.from = ""
         session.content = ""

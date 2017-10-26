@@ -1,10 +1,11 @@
-package fr.bnancy.mail.servers.smtp.commands
+package fr.bnancy.mail.smtp_server.commands
 
-import fr.bnancy.mail.servers.smtp.commands.annotations.Command
-import fr.bnancy.mail.servers.smtp.data.Session
-import fr.bnancy.mail.servers.smtp.data.SessionState
-import fr.bnancy.mail.servers.smtp.data.SmtpResponseCode
-import fr.bnancy.mail.servers.smtp.listeners.SessionListener
+import fr.bnancy.mail.getHostname
+import fr.bnancy.mail.smtp_server.commands.annotations.Command
+import fr.bnancy.mail.smtp_server.data.Session
+import fr.bnancy.mail.smtp_server.data.SessionState
+import fr.bnancy.mail.smtp_server.data.SmtpResponseCode
+import fr.bnancy.mail.smtp_server.listeners.SessionListener
 
 @Command("EHLO")
 class EhloCommand: AbstractCommand {
@@ -19,7 +20,18 @@ class EhloCommand: AbstractCommand {
 
         session.state.add(SessionState.HELO)
 
-        return SmtpResponseCode.EHLO
+        val options = "-${getHostname()}\r\n" +
+                "250-SIZE 51200000\r\n" +
+                "250-ETRN\r\n" +
+                "250-STARTTLS\r\n" +
+                "250-8BITMIME\r\n" +
+                when {
+                    session.secured -> "250-AUTH LOGIN\r\n"
+                    else -> ""
+                } +
+                "250 DSN"
+
+        return SmtpResponseCode.EHLO(options)
     }
 
 }

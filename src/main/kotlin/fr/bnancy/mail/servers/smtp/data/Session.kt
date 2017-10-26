@@ -1,5 +1,6 @@
-package fr.bnancy.mail.servers.smtp.data
+package fr.bnancy.mail.smtp_server.data
 
+import fr.bnancy.mail.servers.smtp.data.LoginState
 import java.time.Instant
 import java.util.*
 
@@ -11,7 +12,10 @@ data class Session(
         var state: MutableList<SessionState> = emptyList<SessionState>().toMutableList(),
         var senderHostname: String = "",
         var receivingData: Boolean = false,
+        var loginState: MutableList<LoginState> = emptyList<LoginState>().toMutableList(),
+        var loginUsername: String = "",
         var receivedAt: Date = Date.from(Instant.now()),
         var delivered: Boolean = false,
-        var secured: Boolean = false
+        var secured: Boolean = false,
+        var authenticated: Boolean = false
 )

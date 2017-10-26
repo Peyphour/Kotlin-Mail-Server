@@ -1,10 +1,9 @@
-package fr.bnancy.mail.servers.smtp
+package fr.bnancy.mail.smtp_server
 
 import fr.bnancy.mail.config.SmtpServerConfig
-import fr.bnancy.mail.servers.AbstractServer
-import fr.bnancy.mail.servers.smtp.commands.AbstractCommand
-import fr.bnancy.mail.servers.smtp.commands.annotations.Command
-import fr.bnancy.mail.servers.smtp.listeners.SessionListener
+import fr.bnancy.mail.smtp_server.commands.AbstractCommand
+import fr.bnancy.mail.smtp_server.commands.annotations.Command
+import fr.bnancy.mail.smtp_server.listeners.SessionListener
 import org.reflections.Reflections
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.scheduling.annotation.Scheduled
@@ -12,10 +11,11 @@ import org.springframework.stereotype.Component
 import java.net.ServerSocket
 import java.net.Socket
 import java.net.SocketException
+import java.util.logging.Logger
 import javax.annotation.PostConstruct
 
 @Component
-class SmtpServer : AbstractServer {
+class Server {
 
     @Autowired
     lateinit var configSmtp: SmtpServerConfig
@@ -24,35 +24,38 @@ class SmtpServer : AbstractServer {
     lateinit var listener: SessionListener
 
     lateinit var socketServer: ServerSocket
+
+    private val logger = Logger.getLogger(javaClass.simpleName)
+
     var running: Boolean = false
-    val clients: ArrayList<SmtpClientRunnable> = ArrayList()
+    val clients: ArrayList<ClientRunnable> = ArrayList()
 
     val commands: MutableMap<String, AbstractCommand> = HashMap()
 
     @PostConstruct
     fun init() {
-        val reflections = Reflections("fr.bnancy.mail.servers.smtp.commands")
+        val reflections = Reflections("fr.bnancy.mail.smtp_server.commands")
         for (classz in reflections.getTypesAnnotatedWith(Command::class.java)) {
             commands.put(classz.getAnnotation(Command::class.java).command, classz.newInstance() as AbstractCommand)
         }
     }
 
-    override fun start() {
+    fun start() {
         this.running = true
         this.socketServer = ServerSocket(this.configSmtp.port)
         Thread({
             while(running) {
                 val client: Socket = this.socketServer.accept()
-                clients.add(SmtpClientRunnable(client, listener, configSmtp.sessionTimeout, commands))
+                clients.add(ClientRunnable(client, listener, configSmtp.sessionTimeout, commands))
                 Thread(clients[clients.size - 1], "client-runnable-${client.inetAddress.hostName}").start()
             }
             println("server closed")
         }, "smtp-server").start()
 
-        println("Starting SMTP server on port ${configSmtp.port}")
+        logger.info("Starting SMTP server on port ${configSmtp.port}")
     }
 
-    override fun stop() {
+    fun stop() {
         running = false
         clients.forEach { it.stop() }
         try {
@@ -68,6 +71,7 @@ class SmtpServer : AbstractServer {
 
     @Scheduled(fixedDelay = 1000 * 60 * 60, initialDelay = 1000 * 60 * 60) // One call per hour
     fun cleanupHangingClients() {
+        logger.info("Starting to clean threads")
         if(!this.running)
             return
         this.stop()
