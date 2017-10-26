@@ -1,5 +1,6 @@
 package fr.bnancy.mail.servers.smtp
 
+import fr.bnancy.mail.getHostname
 import fr.bnancy.mail.servers.smtp.commands.AbstractCommand
 import fr.bnancy.mail.servers.smtp.data.LoginState
 import fr.bnancy.mail.servers.smtp.data.Session
@@ -32,7 +33,7 @@ class ClientRunnable(private var clientSocket: Socket, val listener: SessionList
             session.secured = true
         }
 
-        write(out, SmtpResponseCode.HELO("mail.bnancy.ovh ESMTP Ready").code)
+        write(out, SmtpResponseCode.HELO("${getHostname()} ESMTP Ready").code)
 
         while(running && (System.currentTimeMillis() - timeout < sessionTimeout)) {
 
@@ -70,6 +71,7 @@ class ClientRunnable(private var clientSocket: Socket, val listener: SessionList
             if (session.state.contains(SessionState.DATA) && !session.delivered) {
                 listener.deliverMail(session)
                 session.delivered = true
+                resetSession()
             }
 
         }
@@ -90,6 +92,7 @@ class ClientRunnable(private var clientSocket: Socket, val listener: SessionList
         session.from = ""
         session.content = ""
         session.receivingData = false
+        session.delivered = false
     }
 
     private fun createTlsSocket(): SSLSocket {

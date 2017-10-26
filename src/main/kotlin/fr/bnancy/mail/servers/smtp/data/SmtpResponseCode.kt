@@ -2,7 +2,7 @@ package fr.bnancy.mail.servers.smtp.data
 
 enum class SmtpResponseCode(var code: String) {
     HELO("220"),
-    EHLO("250-mail.bnancy.ovh\r\n"),
+    EHLO("250"),
     OK("250"),
     DATA("354"),
     AUTH_GO_ON("334"),
@@ -19,7 +19,10 @@ enum class SmtpResponseCode(var code: String) {
 
     operator fun invoke(s: String = ""): SmtpResponseCode {
         if(code.length >= 3)
-            code = code.substring(0, 3) + " " + s
+            code = code.substring(0, 3) + when(this) {
+                EHLO -> ""
+                else -> " " // Add a space when not EHLO
+            } + s
         return this
     }
 }

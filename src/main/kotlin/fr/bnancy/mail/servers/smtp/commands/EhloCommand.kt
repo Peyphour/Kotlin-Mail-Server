@@ -1,5 +1,6 @@
 package fr.bnancy.mail.servers.smtp.commands
 
+import fr.bnancy.mail.getHostname
 import fr.bnancy.mail.servers.smtp.commands.annotations.Command
 import fr.bnancy.mail.servers.smtp.data.Session
 import fr.bnancy.mail.servers.smtp.data.SessionState
@@ -19,12 +20,13 @@ class EhloCommand: AbstractCommand {
 
         session.state.add(SessionState.HELO)
 
-        val options = "250-SIZE 51200000\r\n" +
+        val options = "-${getHostname()}\r\n" +
+                "250-SIZE 51200000\r\n" +
                 "250-ETRN\r\n" +
                 "250-STARTTLS\r\n" +
                 "250-8BITMIME\r\n" +
                 when {
-                    session.secured -> "250-AUTH PLAIN\r\n"
+                    session.secured -> "250-AUTH LOGIN\r\n"
                     else -> ""
                 } +
                 "250 DSN"
