@@ -1,9 +1,10 @@
-package fr.bnancy.mail.smtp_server
+package fr.bnancy.mail.servers.smtp
 
 import fr.bnancy.mail.config.SmtpServerConfig
-import fr.bnancy.mail.smtp_server.commands.AbstractCommand
-import fr.bnancy.mail.smtp_server.commands.annotations.Command
-import fr.bnancy.mail.smtp_server.listeners.SessionListener
+import fr.bnancy.mail.servers.AbstractServer
+import fr.bnancy.mail.servers.smtp.commands.AbstractCommand
+import fr.bnancy.mail.servers.smtp.commands.annotations.Command
+import fr.bnancy.mail.servers.smtp.listeners.SessionListener
 import org.reflections.Reflections
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.scheduling.annotation.Scheduled
@@ -15,7 +16,7 @@ import java.util.logging.Logger
 import javax.annotation.PostConstruct
 
 @Component
-class Server {
+class SmtpServer : AbstractServer {
 
     @Autowired
     lateinit var configSmtp: SmtpServerConfig
@@ -34,13 +35,13 @@ class Server {
 
     @PostConstruct
     fun init() {
-        val reflections = Reflections("fr.bnancy.mail.smtp_server.commands")
+        val reflections = Reflections("fr.bnancy.mail.servers.smtp.commands")
         for (classz in reflections.getTypesAnnotatedWith(Command::class.java)) {
             commands.put(classz.getAnnotation(Command::class.java).command, classz.newInstance() as AbstractCommand)
         }
     }
 
-    fun start() {
+    override fun start() {
         this.running = true
         this.socketServer = ServerSocket(this.configSmtp.port)
         Thread({
@@ -55,7 +56,7 @@ class Server {
         logger.info("Starting SMTP server on port ${configSmtp.port}")
     }
 
-    fun stop() {
+    override fun stop() {
         running = false
         clients.forEach { it.stop() }
         try {

@@ -1,8 +1,8 @@
 package fr.bnancy.mail.web.admin
 
 import fr.bnancy.mail.data.UserAuthority
-import fr.bnancy.mail.service.UserService
 import fr.bnancy.mail.servers.smtp.SmtpServer
+import fr.bnancy.mail.service.UserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model

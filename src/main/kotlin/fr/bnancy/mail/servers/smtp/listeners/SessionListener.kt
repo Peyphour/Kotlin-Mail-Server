@@ -1,6 +1,6 @@
-package fr.bnancy.mail.smtp_server.listeners
+package fr.bnancy.mail.servers.smtp.listeners
 
-import fr.bnancy.mail.smtp_server.data.Session
+import fr.bnancy.mail.servers.smtp.data.Session
 
 interface SessionListener {
     fun sessionOpened(session: Session)

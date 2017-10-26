@@ -1,13 +1,13 @@
-package fr.bnancy.mail.smtp_server
+package fr.bnancy.mail.servers.smtp
 
 import fr.bnancy.mail.getHostname
-import fr.bnancy.mail.smtp_server.commands.AbstractCommand
+import fr.bnancy.mail.servers.smtp.commands.AbstractCommand
 import fr.bnancy.mail.servers.smtp.data.LoginState
-import fr.bnancy.mail.smtp_server.data.Session
-import fr.bnancy.mail.smtp_server.data.SessionState
-import fr.bnancy.mail.smtp_server.data.SmtpResponseCode
-import fr.bnancy.mail.smtp_server.io.CRLFTerminatedReader
-import fr.bnancy.mail.smtp_server.listeners.SessionListener
+import fr.bnancy.mail.servers.smtp.data.Session
+import fr.bnancy.mail.servers.smtp.data.SessionState
+import fr.bnancy.mail.servers.smtp.data.SmtpResponseCode
+import fr.bnancy.mail.servers.smtp.io.CRLFTerminatedReader
+import fr.bnancy.mail.servers.smtp.listeners.SessionListener
 import java.io.PrintWriter
 import java.net.InetSocketAddress
 import java.net.Socket
