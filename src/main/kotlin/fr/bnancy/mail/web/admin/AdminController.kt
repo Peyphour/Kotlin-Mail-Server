@@ -41,7 +41,7 @@ class AdminController {
     }
 
     @RequestMapping("/start-server", method = arrayOf(RequestMethod.POST))
-    fun startSmtpServer(@RequestParam("server") server: String): String {
+    fun startServer(@RequestParam("server") server: String): String {
         when(server) {
             "smtp" -> {
                 if(!smtpServer.running)
@@ -60,7 +60,7 @@ class AdminController {
     }
 
     @RequestMapping("/stop-server", method = arrayOf(RequestMethod.POST))
-    fun stopSmtpServer(@RequestParam("server") server: String): String {
+    fun stopServer(@RequestParam("server") server: String): String {
         when(server) {
             "smtp" -> {
                 if(smtpServer.running)

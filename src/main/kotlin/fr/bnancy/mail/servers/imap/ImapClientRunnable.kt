@@ -10,8 +10,8 @@ class ImapClientRunnable(private var clientSocket: SSLSocket) : Runnable {
 
     override fun run() {
 
-        var reader = CRLFTerminatedReader(this.clientSocket.inputStream)
-        var out = PrintWriter(this.clientSocket.outputStream, true)
+        val reader = CRLFTerminatedReader(this.clientSocket.inputStream)
+        val out = PrintWriter(this.clientSocket.outputStream, true)
 
         while(running) {
             val line = reader.readLine()

@@ -5,6 +5,8 @@ import fr.bnancy.mail.servers.AbstractServer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import java.net.ServerSocket
+import java.util.logging.Logger
+import javax.net.ssl.SSLServerSocket
 import javax.net.ssl.SSLServerSocketFactory
 import javax.net.ssl.SSLSocket
 
@@ -14,16 +16,18 @@ class ImapServer : AbstractServer {
     @Autowired
     lateinit var configImap: ImapServerConfig
 
-    lateinit var socketServer: ServerSocket
+    lateinit var socketServer: SSLServerSocket
 
     var running: Boolean = false
     val clients: ArrayList<ImapClientRunnable> = ArrayList()
+
+    private val logger = Logger.getLogger(javaClass.simpleName)
 
     override fun start() {
         this.running = true
         this.socketServer = SSLServerSocketFactory
                 .getDefault()
-                .createServerSocket(this.configImap.port)
+                .createServerSocket(this.configImap.port) as SSLServerSocket
         Thread({
             while(running) {
                 val client = this.socketServer.accept() as SSLSocket
@@ -32,7 +36,7 @@ class ImapServer : AbstractServer {
                 Thread(clients[clients.size - 1]).start()
             }
         }, "imap-server").start()
-        println("Starting IMAP server on port ${configImap.port}")
+        logger.info("Starting IMAP server on port ${configImap.port}")
     }
 
     override fun stop() {
