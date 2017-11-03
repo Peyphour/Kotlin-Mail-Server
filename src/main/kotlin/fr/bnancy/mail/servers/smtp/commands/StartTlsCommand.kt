@@ -6,7 +6,7 @@ import fr.bnancy.mail.servers.smtp.data.SessionState
 import fr.bnancy.mail.servers.smtp.data.SmtpResponseCode
 import fr.bnancy.mail.servers.smtp.listeners.SessionListener
 
-@Command("STARTTLS")
+@Command("STARTTLS", arrayOf("smtp"))
 class StartTlsCommand : AbstractCommand {
     override fun execute(data: String, session: Session, listener: SessionListener): SmtpResponseCode {
         if(session.state.contains(SessionState.TLS_STARTED))

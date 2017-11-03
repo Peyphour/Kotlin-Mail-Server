@@ -29,6 +29,10 @@ class ClientRunnable(private var clientSocket: Socket, val listener: SessionList
         session.netAddress = this.clientSocket.inetAddress.hostAddress
         listener.sessionOpened(session)
 
+        if(clientSocket is SSLSocket) {
+            session.secured = true
+        }
+
         write(out, SmtpResponseCode.HELO("${getHostname()} ESMTP Ready").code)
 
         while(running && (System.currentTimeMillis() - timeout < sessionTimeout)) {

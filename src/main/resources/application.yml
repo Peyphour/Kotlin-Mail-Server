@@ -2,9 +2,13 @@ smtp:
   port: 25
   sessionTimeout: 60000
 
+submission:
+  port: 587
+  sessionTimeout: 60000
+
 imap:
-   port: 993
-   sessionTimeout: 60000
+  port: 993
+  sessionTimeout: 60000
 
 spring:
   datasource:

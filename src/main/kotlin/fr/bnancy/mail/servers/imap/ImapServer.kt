@@ -38,4 +38,8 @@ class ImapServer : AbstractServer {
     override fun stop() {
         this.running = false
     }
+
+    fun isRunning(): Boolean {
+        return this.running
+    }
 }

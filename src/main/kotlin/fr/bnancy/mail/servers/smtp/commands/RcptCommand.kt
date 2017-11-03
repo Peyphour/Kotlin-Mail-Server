@@ -16,7 +16,7 @@ class RcptCommand: AbstractCommand {
 
         val address = mailRegex.find(data)!!.groupValues[1]
 
-        if(!listener.acceptRecipient(address))
+        if(!listener.acceptRecipient(address, session))
             return SmtpResponseCode.MAILBOX_UNAVAILABLE("<$address> does not exists here")
 
         session.to.add(address)

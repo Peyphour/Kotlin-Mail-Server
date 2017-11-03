@@ -1,6 +1,6 @@
 package fr.bnancy.mail.data
 
-interface MailWithoutContent {
+interface MailProjection {
     fun getId(): Long
     fun getRecipients(): ArrayList<String>
     fun getHeaders(): String
