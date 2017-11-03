@@ -1,4 +1,4 @@
-package fr.bnancy.mail.smtp_server.io
+package fr.bnancy.mail.servers.smtp.io
 
 /***********************************************************************
  * Copyright (c) 2000-2006 The Apache Software Foundation.             *

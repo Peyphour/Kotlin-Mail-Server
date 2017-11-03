@@ -1,10 +1,10 @@
-package fr.bnancy.mail.smtp_server.commands
+package fr.bnancy.mail.servers.smtp.commands
 
-import fr.bnancy.mail.smtp_server.commands.annotations.Command
-import fr.bnancy.mail.smtp_server.data.Session
-import fr.bnancy.mail.smtp_server.data.SessionState
-import fr.bnancy.mail.smtp_server.data.SmtpResponseCode
-import fr.bnancy.mail.smtp_server.listeners.SessionListener
+import fr.bnancy.mail.servers.smtp.commands.annotations.Command
+import fr.bnancy.mail.servers.smtp.data.Session
+import fr.bnancy.mail.servers.smtp.data.SessionState
+import fr.bnancy.mail.servers.smtp.data.SmtpResponseCode
+import fr.bnancy.mail.servers.smtp.listeners.SessionListener
 
 @Command("RCPT")
 class RcptCommand: AbstractCommand {
@@ -16,7 +16,7 @@ class RcptCommand: AbstractCommand {
 
         val address = mailRegex.find(data)!!.groupValues[1]
 
-        if(!listener.acceptRecipient(address))
+        if(!listener.acceptRecipient(address, session))
             return SmtpResponseCode.MAILBOX_UNAVAILABLE("<$address> does not exists here")
 
         session.to.add(address)

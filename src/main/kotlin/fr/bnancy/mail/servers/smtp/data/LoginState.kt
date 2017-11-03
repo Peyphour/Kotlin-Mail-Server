@@ -1,4 +1,4 @@
-package fr.bnancy.mail.smtp_server.data
+package fr.bnancy.mail.servers.smtp.data
 
 enum class LoginState {
     LOGIN_IN_PROGRESS,
