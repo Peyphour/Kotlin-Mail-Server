@@ -1,19 +1,19 @@
 package fr.bnancy.mail.servers.smtp.commands
 
-import fr.bnancy.mail.servers.smtp.commands.annotations.Command
-import fr.bnancy.mail.servers.smtp.data.Session
-import fr.bnancy.mail.servers.smtp.data.SessionState
+import fr.bnancy.mail.servers.smtp.commands.annotations.SmtpCommand
+import fr.bnancy.mail.servers.smtp.data.SmtpSession
+import fr.bnancy.mail.servers.smtp.data.SmtpSessionState
 import fr.bnancy.mail.servers.smtp.data.SmtpResponseCode
 import fr.bnancy.mail.servers.smtp.listeners.SessionListener
 
-@Command("STARTTLS", arrayOf("smtp"))
-class StartTlsCommand : AbstractCommand {
-    override fun execute(data: String, session: Session, listener: SessionListener): SmtpResponseCode {
-        if(session.state.contains(SessionState.TLS_STARTED))
+@SmtpCommand("STARTTLS", arrayOf("smtp"))
+class StartTlsCommand : SmtpAbstractCommand {
+    override fun execute(data: String, smtpSession: SmtpSession, listener: SessionListener): SmtpResponseCode {
+        if(smtpSession.stateSmtp.contains(SmtpSessionState.TLS_STARTED))
             return SmtpResponseCode.NOT_AVAILABLE("TLS already enabled")
 
 
-        session.state.add(SessionState.TLS_STARTED)
+        smtpSession.stateSmtp.add(SmtpSessionState.TLS_STARTED)
 
         return SmtpResponseCode.HELO("Ready to start TLS")
     }

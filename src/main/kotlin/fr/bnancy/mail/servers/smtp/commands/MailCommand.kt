@@ -1,23 +1,23 @@
 package fr.bnancy.mail.servers.smtp.commands
 
-import fr.bnancy.mail.servers.smtp.commands.annotations.Command
-import fr.bnancy.mail.servers.smtp.data.Session
-import fr.bnancy.mail.servers.smtp.data.SessionState
+import fr.bnancy.mail.servers.smtp.commands.annotations.SmtpCommand
+import fr.bnancy.mail.servers.smtp.data.SmtpSession
+import fr.bnancy.mail.servers.smtp.data.SmtpSessionState
 import fr.bnancy.mail.servers.smtp.data.SmtpResponseCode
 import fr.bnancy.mail.servers.smtp.listeners.SessionListener
 
-@Command("MAIL")
-class MailCommand: AbstractCommand {
-    override fun execute(data: String, session: Session, listener: SessionListener): SmtpResponseCode {
+@SmtpCommand("MAIL")
+class MailCommand: SmtpAbstractCommand {
+    override fun execute(data: String, smtpSession: SmtpSession, listener: SessionListener): SmtpResponseCode {
 
-        if(!session.state.contains(SessionState.HELO))
+        if(!smtpSession.stateSmtp.contains(SmtpSessionState.HELO))
             return SmtpResponseCode.BAD_SEQUENCE("Must issue HELO/EHLO first.")
-        if(session.state.contains(SessionState.MAIL))
+        if(smtpSession.stateSmtp.contains(SmtpSessionState.MAIL))
             return SmtpResponseCode.BAD_SEQUENCE("Transaction in progress already.")
 
         // Clean buffers as specified by RFC
-        session.to = ArrayList()
-        session.content = ""
+        smtpSession.to = ArrayList()
+        smtpSession.content = ""
 
         val mailRegex = Regex("<(.*)>")
         val address = mailRegex.find(data)!!.groupValues[1]
@@ -25,9 +25,9 @@ class MailCommand: AbstractCommand {
         if(!listener.acceptSender(address))
             return SmtpResponseCode.MAILBOX_UNAVAILABLE("$address isn't authorized to send mail here")
 
-        session.from = address
+        smtpSession.from = address
 
-        session.state.add(SessionState.MAIL)
+        smtpSession.stateSmtp.add(SmtpSessionState.MAIL)
 
         return SmtpResponseCode.OK("OK")
     }

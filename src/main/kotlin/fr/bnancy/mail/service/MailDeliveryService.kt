@@ -6,7 +6,7 @@ import fr.bnancy.mail.repository.MailRepository
 import fr.bnancy.mail.repository.UserRepository
 import fr.bnancy.mail.servers.smtp.data.Header
 import fr.bnancy.mail.servers.smtp.data.Mail
-import fr.bnancy.mail.servers.smtp.data.Session
+import fr.bnancy.mail.servers.smtp.data.SmtpSession
 import org.simplejavamail.email.Email
 import org.simplejavamail.mailer.Mailer
 import org.simplejavamail.mailer.config.ServerConfig
@@ -30,21 +30,21 @@ class MailDeliveryService {
     @Autowired
     lateinit var mailRepository: MailRepository
 
-    private val externalDeliveryQueue: LinkedList<Session> = LinkedList()
-    private val internalDeliveryQueue: LinkedList<Session> = LinkedList()
-    private val tryLaterDeliveryQueue: LinkedList<Pair<Session, Long>> = LinkedList()
+    private val externalDeliveryQueue: LinkedList<SmtpSession> = LinkedList()
+    private val internalDeliveryQueue: LinkedList<SmtpSession> = LinkedList()
+    private val tryLaterDeliveryQueue: LinkedList<Pair<SmtpSession, Long>> = LinkedList()
 
     private val ONE_MINUTE_MILLIS = 1000 * 60 * 1
 
     private val logger = Logger.getLogger(javaClass.simpleName)
 
-    fun queueDelivery(session: Session) {
-        logger.info("queuing delivery $session")
-        for (recipient in session.to) {
+    fun queueDelivery(smtpSession: SmtpSession) {
+        logger.info("queuing delivery $smtpSession")
+        for (recipient in smtpSession.to) {
             if(userRepository.findByMail(recipient) == null) {
-                externalDeliveryQueue.add(session.copy(to = arrayListOf(recipient)))
+                externalDeliveryQueue.add(smtpSession.copy(to = arrayListOf(recipient)))
             } else {
-                internalDeliveryQueue.add(session.copy(to = arrayListOf(recipient)))
+                internalDeliveryQueue.add(smtpSession.copy(to = arrayListOf(recipient)))
             }
         }
     }
@@ -65,7 +65,7 @@ class MailDeliveryService {
 
     @Scheduled(fixedDelay = 1000, initialDelay = 1000)
     fun tryDeliverAgain() {
-        val found = mutableListOf<Pair<Session, Long>>()
+        val found = mutableListOf<Pair<SmtpSession, Long>>()
         for((session, time) in tryLaterDeliveryQueue) {
             if(time >= System.currentTimeMillis()) {
                 logger.info("New delivery for $session (time : $time)")
@@ -82,8 +82,8 @@ class MailDeliveryService {
         return (lookups[0] as MXRecord).target.toString(true)
     }
 
-    private fun sendMail(session: Session) {
-        val mail = Mail(session).toEntity()
+    private fun sendMail(smtpSession: SmtpSession) {
+        val mail = Mail(smtpSession).toEntity()
 
         for(recipient in mail.recipients) {
             val email = Email()
@@ -100,8 +100,8 @@ class MailDeliveryService {
                         TransportStrategy.SMTP_TLS
                 ).sendMail(email)
             } catch (e: Exception) {
-                logger.info("got exception ${e.message} will sending to ${session.to}")
-                tryLaterDeliveryQueue.add(session to (System.currentTimeMillis() + ONE_MINUTE_MILLIS))
+                logger.info("got exception ${e.message} will sending to ${smtpSession.to}")
+                tryLaterDeliveryQueue.add(smtpSession to (System.currentTimeMillis() + ONE_MINUTE_MILLIS))
             }
         }
     }

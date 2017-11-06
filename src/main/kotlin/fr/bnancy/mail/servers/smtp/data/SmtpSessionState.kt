@@ -1,6 +1,6 @@
 package fr.bnancy.mail.servers.smtp.data
 
-enum class SessionState {
+enum class SmtpSessionState {
     START,
     HELO,
     DATA,

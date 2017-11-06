@@ -1,8 +1,8 @@
 package fr.bnancy.mail.servers.smtp
 
 import fr.bnancy.mail.config.SmtpServerConfig
-import fr.bnancy.mail.servers.smtp.commands.AbstractCommand
-import fr.bnancy.mail.servers.smtp.commands.annotations.Command
+import fr.bnancy.mail.servers.smtp.commands.SmtpAbstractCommand
+import fr.bnancy.mail.servers.smtp.commands.annotations.SmtpCommand
 import fr.bnancy.mail.servers.smtp.listeners.SessionListener
 import org.reflections.Reflections
 import org.springframework.beans.factory.annotation.Autowired
@@ -30,14 +30,14 @@ class SmtpServer {
     var running: Boolean = false
     val clients: ArrayList<ClientRunnable> = ArrayList()
 
-    val commands: MutableMap<String, AbstractCommand> = HashMap()
+    val commands: MutableMap<String, SmtpAbstractCommand> = HashMap()
 
     @PostConstruct
     fun init() {
         val reflections = Reflections("fr.bnancy.mail.servers.smtp.commands")
-        reflections.getTypesAnnotatedWith(Command::class.java)
-                .filter { it.getAnnotation(Command::class.java).scope.contains("smtp") }
-                .forEach { commands.put(it.getAnnotation(Command::class.java).command, it.newInstance() as AbstractCommand) }
+        reflections.getTypesAnnotatedWith(SmtpCommand::class.java)
+                .filter { it.getAnnotation(SmtpCommand::class.java).scope.contains("smtp") }
+                .forEach { commands.put(it.getAnnotation(SmtpCommand::class.java).command, it.newInstance() as SmtpAbstractCommand) }
     }
 
     fun start() {

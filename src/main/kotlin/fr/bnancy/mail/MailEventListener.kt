@@ -1,8 +1,8 @@
 package fr.bnancy.mail
 
 import fr.bnancy.mail.repository.UserRepository
-import fr.bnancy.mail.servers.smtp.data.Session
-import fr.bnancy.mail.servers.smtp.data.SessionState
+import fr.bnancy.mail.servers.smtp.data.SmtpSession
+import fr.bnancy.mail.servers.smtp.data.SmtpSessionState
 import fr.bnancy.mail.servers.smtp.listeners.SessionListener
 import fr.bnancy.mail.service.IpBlacklistService
 import fr.bnancy.mail.service.MailDeliveryService
@@ -32,28 +32,28 @@ class MailEventListener: SessionListener {
         return true
     }
 
-    override fun deliverMail(session: Session) {
-        mailDeliveryService.queueDelivery(session)
+    override fun deliverMail(smtpSession: SmtpSession) {
+        mailDeliveryService.queueDelivery(smtpSession)
     }
 
-    override fun acceptRecipient(recipientAddress: String, session: Session): Boolean {
-        if(!session.authenticated)
+    override fun acceptRecipient(recipientAddress: String, smtpSession: SmtpSession): Boolean {
+        if(!smtpSession.authenticated)
             return userRepository.findByMail(recipientAddress) != null
         return true
     }
 
-    override fun sessionOpened(session: Session) {
-        logger.info(session.toString())
-        if(ipBlacklistService.blacklistedIp(session.netAddress))
-            session.state.add(SessionState.QUIT)
+    override fun sessionOpened(smtpSession: SmtpSession) {
+        logger.info(smtpSession.toString())
+        if(ipBlacklistService.blacklistedIp(smtpSession.netAddress))
+            smtpSession.stateSmtp.add(SmtpSessionState.QUIT)
     }
 
-    override fun sessionClosed(session: Session) {
+    override fun sessionClosed(smtpSession: SmtpSession) {
         // println(Mail(session))
     }
 
-    override fun isValidUser(session: Session, password: String): Boolean {
-        session.authenticated = userService.isValidUser(session.loginUsername, password)
-        return session.authenticated
+    override fun isValidUser(smtpSession: SmtpSession, password: String): Boolean {
+        smtpSession.authenticated = userService.isValidUser(smtpSession.loginUsername, password)
+        return smtpSession.authenticated
     }
 }

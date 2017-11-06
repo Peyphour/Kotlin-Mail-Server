@@ -1,28 +1,24 @@
-package fr.bnancy.mail.servers.smtp;
+package fr.bnancy.mail.servers.pop3
 
-import fr.bnancy.mail.config.SubmissionServerConfig
-import fr.bnancy.mail.servers.smtp.commands.SmtpAbstractCommand
-import fr.bnancy.mail.servers.smtp.commands.annotations.SmtpCommand
-import fr.bnancy.mail.servers.smtp.listeners.SessionListener
+import fr.bnancy.mail.config.Pop3ServerConfig
+import fr.bnancy.mail.servers.pop3.commands.Pop3AbstractCommand
+import fr.bnancy.mail.servers.pop3.commands.annotations.Pop3Command
 import org.reflections.Reflections
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
-import java.net.Socket
 import java.net.SocketException
 import java.util.logging.Logger
 import javax.annotation.PostConstruct
 import javax.net.ssl.SSLServerSocket
 import javax.net.ssl.SSLServerSocketFactory
+import javax.net.ssl.SSLSocket
 
 @Component
-class SubmissionServer {
+class Pop3Server {
 
     @Autowired
-    lateinit var configSubmission: SubmissionServerConfig
-
-    @Autowired
-    lateinit var listener: SessionListener
+    lateinit var pop3Config: Pop3ServerConfig
 
     lateinit var sslServerSocket: SSLServerSocket
 
@@ -31,29 +27,27 @@ class SubmissionServer {
     var running: Boolean = false
     val clients: ArrayList<ClientRunnable> = ArrayList()
 
-    val commands: MutableMap<String, SmtpAbstractCommand> = HashMap()
+    val commands: MutableMap<String, Pop3AbstractCommand> = HashMap()
 
     @PostConstruct
     fun init() {
-        val reflections = Reflections("fr.bnancy.mail.servers.smtp.commands")
-        reflections.getTypesAnnotatedWith(SmtpCommand::class.java)
-                .filter { it.getAnnotation(SmtpCommand::class.java).scope.contains("submission") }
-                .forEach { commands.put(it.getAnnotation(SmtpCommand::class.java).command, it.newInstance() as SmtpAbstractCommand) }
+        val reflections = Reflections("fr.bnancy.mail.servers.imap.commands")
+        reflections.getTypesAnnotatedWith(Pop3Command::class.java)
+                .forEach { commands.put(it.getAnnotation(Pop3Command::class.java).command, it.newInstance() as Pop3AbstractCommand) }
     }
 
     fun start() {
         this.running = true
-        this.sslServerSocket = SSLServerSocketFactory.getDefault().createServerSocket(configSubmission.port) as SSLServerSocket
+        this.sslServerSocket = SSLServerSocketFactory.getDefault().createServerSocket(pop3Config.port) as SSLServerSocket
         Thread({
             while(running) {
-                val client: Socket = this.sslServerSocket.accept()
-                clients.add(ClientRunnable(client, listener, configSubmission.sessionTimeout, commands))
+                val client: SSLSocket = sslServerSocket.accept() as SSLSocket
+                clients.add(ClientRunnable(client, pop3Config.sessionTimeout, commands))
                 Thread(clients[clients.size - 1], "client-runnable-${client.inetAddress.hostName}").start()
             }
-            println("server closed")
-        }, "submission-server").start()
+        }, "pop3-server").start()
 
-        logger.info("Starting Submission server on port ${configSubmission.port}")
+        logger.info("Starting POP3 server on port ${pop3Config.port}")
     }
 
     fun stop() {

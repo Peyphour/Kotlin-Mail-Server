@@ -4,5 +4,5 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Configuration
 
 @Configuration
-@EnableConfigurationProperties(SubmissionServerConfig::class, SmtpServerConfig::class)
+@EnableConfigurationProperties(SubmissionServerConfig::class, SmtpServerConfig::class, Pop3ServerConfig::class)
 class Configuration

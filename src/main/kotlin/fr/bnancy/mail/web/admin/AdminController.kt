@@ -1,6 +1,7 @@
 package fr.bnancy.mail.web.admin
 
 import fr.bnancy.mail.data.UserAuthority
+import fr.bnancy.mail.servers.pop3.Pop3Server
 import fr.bnancy.mail.servers.smtp.SmtpServer
 import fr.bnancy.mail.servers.smtp.SubmissionServer
 import fr.bnancy.mail.service.UserService
@@ -22,13 +23,17 @@ class AdminController {
     lateinit var submissionServer: SubmissionServer
 
     @Autowired
+    lateinit var pop3Server: Pop3Server
+
+    @Autowired
     lateinit var userService: UserService
 
     @RequestMapping
     fun index(model: Model): String {
         model.addAttribute("serversStatus", mapOf(
                 "smtp" to smtpServer.isRunning(),
-                "submission" to submissionServer.isRunning()
+                "submission" to submissionServer.isRunning(),
+                "pop3" to pop3Server.isRunning()
         ))
         model.addAttribute("users", userService.getAllUsers())
         model.addAttribute("roles", UserAuthority.values())
@@ -46,6 +51,10 @@ class AdminController {
                 if(!submissionServer.running)
                     submissionServer.start()
             }
+            "pop3" -> {
+                if(!pop3Server.running)
+                    pop3Server.start()
+            }
         }
         return "redirect:/admin"
     }
@@ -60,6 +69,10 @@ class AdminController {
             "submission" -> {
                 if(submissionServer.running)
                     submissionServer.stop()
+            }
+            "pop3" -> {
+                if(pop3Server.running)
+                    pop3Server.stop()
             }
         }
         return "redirect:/admin"

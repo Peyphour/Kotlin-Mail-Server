@@ -3,14 +3,14 @@ package fr.bnancy.mail.servers.smtp.data
 import com.fasterxml.jackson.databind.ObjectMapper
 import fr.bnancy.mail.data.Mail
 
-class Mail(session: Session) {
+class Mail(smtpSession: SmtpSession) {
 
-    private val sender = session.from
-    private val recipients = session.to
-    private val headers = parseHeaders(session.content)
-    val content = parseContent(session.content)
-    private val date = session.receivedAt
-    private val secured = session.secured
+    private val sender = smtpSession.from
+    private val recipients = smtpSession.to
+    private val headers = parseHeaders(smtpSession.content)
+    val content = parseContent(smtpSession.content)
+    private val date = smtpSession.receivedAt
+    private val secured = smtpSession.secured
 
     private fun parseHeaders(content: String): String {
         val headers: MutableList<Header> = ArrayList()

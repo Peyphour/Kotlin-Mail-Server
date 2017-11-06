@@ -1,11 +1,11 @@
 package fr.bnancy.mail.servers.smtp
 
 import fr.bnancy.mail.getHostname
-import fr.bnancy.mail.servers.smtp.commands.AbstractCommand
+import fr.bnancy.mail.servers.smtp.commands.SmtpAbstractCommand
 import fr.bnancy.mail.servers.smtp.data.LoginState
-import fr.bnancy.mail.servers.smtp.data.Session
-import fr.bnancy.mail.servers.smtp.data.SessionState
 import fr.bnancy.mail.servers.smtp.data.SmtpResponseCode
+import fr.bnancy.mail.servers.smtp.data.SmtpSession
+import fr.bnancy.mail.servers.smtp.data.SmtpSessionState
 import fr.bnancy.mail.servers.smtp.io.CRLFTerminatedReader
 import fr.bnancy.mail.servers.smtp.listeners.SessionListener
 import java.io.PrintWriter
@@ -14,10 +14,10 @@ import java.net.Socket
 import javax.net.ssl.SSLSocket
 import javax.net.ssl.SSLSocketFactory
 
-class ClientRunnable(private var clientSocket: Socket, val listener: SessionListener, private val sessionTimeout: Int, val commands: MutableMap<String, AbstractCommand>): Runnable {
+class ClientRunnable(private var clientSocket: Socket, val listener: SessionListener, private val sessionTimeout: Int, val commands: MutableMap<String, SmtpAbstractCommand>): Runnable {
 
     private var running: Boolean = true
-    val session: Session = Session()
+    val smtpSession: SmtpSession = SmtpSession()
 
     private val lineSeparator = "\r\n"
 
@@ -26,11 +26,11 @@ class ClientRunnable(private var clientSocket: Socket, val listener: SessionList
         var out = PrintWriter(this.clientSocket.outputStream, true)
         var timeout: Long = System.currentTimeMillis()
 
-        session.netAddress = this.clientSocket.inetAddress.hostAddress
-        listener.sessionOpened(session)
+        smtpSession.netAddress = this.clientSocket.inetAddress.hostAddress
+        listener.sessionOpened(smtpSession)
 
         if(clientSocket is SSLSocket) {
-            session.secured = true
+            smtpSession.secured = true
         }
 
         write(out, SmtpResponseCode.HELO("${getHostname()} ESMTP Ready").code)
@@ -46,14 +46,14 @@ class ClientRunnable(private var clientSocket: Socket, val listener: SessionList
             }
             println("RCV : $line")
 
-            val response = handleCommand(line, session)
+            val response = handleCommand(line, smtpSession)
 
             if(response != SmtpResponseCode.EMPTY) {
                 write(out, response.code)
                 println("SND : ${response.code}")
             }
 
-            if(session.state.contains(SessionState.TLS_STARTED) && (clientSocket !is SSLSocket)) { // Start TLS negotiation
+            if(smtpSession.stateSmtp.contains(SmtpSessionState.TLS_STARTED) && (clientSocket !is SSLSocket)) { // Start TLS negotiation
                 resetSession()
 
                 val sslSocket = createTlsSocket()
@@ -63,21 +63,21 @@ class ClientRunnable(private var clientSocket: Socket, val listener: SessionList
 
                 clientSocket = sslSocket
 
-                session.secured = true
+                smtpSession.secured = true
             }
 
-            running = !session.state.contains(SessionState.QUIT)
+            running = !smtpSession.stateSmtp.contains(SmtpSessionState.QUIT)
 
-            if (session.state.contains(SessionState.DATA) && !session.delivered) {
-                listener.deliverMail(session)
-                session.delivered = true
+            if (smtpSession.stateSmtp.contains(SmtpSessionState.DATA) && !smtpSession.delivered) {
+                listener.deliverMail(smtpSession)
+                smtpSession.delivered = true
                 resetSession()
             }
 
         }
 
         clientSocket.close()
-        listener.sessionClosed(session)
+        listener.sessionClosed(smtpSession)
     }
 
     private fun write(out: PrintWriter, s: String) {
@@ -87,12 +87,12 @@ class ClientRunnable(private var clientSocket: Socket, val listener: SessionList
     }
 
     private fun resetSession() {
-        session.state = ArrayList()
-        session.to = ArrayList()
-        session.from = ""
-        session.content = ""
-        session.receivingData = false
-        session.delivered = false
+        smtpSession.stateSmtp = ArrayList()
+        smtpSession.to = ArrayList()
+        smtpSession.from = ""
+        smtpSession.content = ""
+        smtpSession.receivingData = false
+        smtpSession.delivered = false
     }
 
     private fun createTlsSocket(): SSLSocket {
@@ -113,16 +113,16 @@ class ClientRunnable(private var clientSocket: Socket, val listener: SessionList
         return socket
     }
 
-    private fun handleCommand(data: String, session: Session): SmtpResponseCode {
+    private fun handleCommand(data: String, smtpSession: SmtpSession): SmtpResponseCode {
 
         val commandString = data.takeWhile { it.isLetter() }.toUpperCase()
 
-        val command: AbstractCommand? = commands[commandString]
+        val command: SmtpAbstractCommand? = commands[commandString]
         return when {
-            session.receivingData -> commands["DATA"]!!.execute(data, session, listener)
-            session.loginState.contains(LoginState.LOGIN_IN_PROGRESS) -> commands["AUTH"]!!.execute(data, session, listener)
+            smtpSession.receivingData -> commands["DATA"]!!.execute(data, smtpSession, listener)
+            smtpSession.loginState.contains(LoginState.LOGIN_IN_PROGRESS) -> commands["AUTH"]!!.execute(data, smtpSession, listener)
             command != null -> command
-                    .execute(data, session, listener)
+                    .execute(data, smtpSession, listener)
             else -> SmtpResponseCode.UNKNOWN_COMMAND("Unknown command : $commandString")
         }
     }
