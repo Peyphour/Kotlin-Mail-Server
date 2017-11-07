@@ -6,19 +6,15 @@ import fr.bnancy.mail.servers.pop3.data.Pop3Session
 import fr.bnancy.mail.servers.pop3.data.Pop3SessionState
 import fr.bnancy.mail.service.Pop3Service
 
-@Pop3Command("USER")
-class UserCommand: Pop3AbstractCommand {
+@Pop3Command("RSET")
+class RsetCommand: Pop3AbstractCommand {
     override fun execute(data: String, session: Pop3Session, pop3Service: Pop3Service): Pop3ResponseCode {
-        val splitedCommand = data.split(' ')
+        if(session.currentState != Pop3SessionState.TRANSACTION)
+            return Pop3ResponseCode.ERR("Unknown command.")
 
-        if(session.currentState != Pop3SessionState.AUTHORIZATION)
-            return Pop3ResponseCode.ERR("Already logged in")
+        val maildropSize = session.messageToDelete.size
+        session.messageToDelete.clear()
 
-        if(splitedCommand.size != 2)
-            return Pop3ResponseCode.ERR("[AUTH] empty username")
-
-        session.user = splitedCommand[1]
-
-        return Pop3ResponseCode.OK()
+        return Pop3ResponseCode.OK("maildrop had $maildropSize messages")
     }
 }

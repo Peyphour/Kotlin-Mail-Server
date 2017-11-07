@@ -11,6 +11,7 @@ import fr.bnancy.mail.servers.smtp.listeners.SmtpSessionListener
 import java.io.PrintWriter
 import java.net.InetSocketAddress
 import java.net.Socket
+import java.util.logging.Logger
 import javax.net.ssl.SSLSocket
 import javax.net.ssl.SSLSocketFactory
 
@@ -20,6 +21,8 @@ class ClientRunnable(private var clientSocket: Socket, val smtpListener: SmtpSes
     val smtpSession: SmtpSession = SmtpSession()
 
     private val lineSeparator = "\r\n"
+
+    private val logger = Logger.getLogger(javaClass.simpleName + " - ${clientSocket.inetAddress.hostAddress}")
 
     override fun run() {
         var reader = CRLFTerminatedReader(this.clientSocket.inputStream)
@@ -44,13 +47,13 @@ class ClientRunnable(private var clientSocket: Socket, val smtpListener: SmtpSes
             if(line == null) { // Received EOF
                 break
             }
-            println("RCV : $line")
+            logger.fine("RCV (SMTP) : $line")
 
             val response = handleCommand(line, smtpSession)
 
             if(response != SmtpResponseCode.EMPTY) {
                 write(out, response.code)
-                println("SND : ${response.code}")
+                logger.fine("SND (SMTP) : ${response.code}")
             }
 
             if(smtpSession.stateSmtp.contains(SmtpSessionState.TLS_STARTED) && (clientSocket !is SSLSocket)) { // Start TLS negotiation

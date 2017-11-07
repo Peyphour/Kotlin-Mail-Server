@@ -60,8 +60,8 @@ class Pop3Service {
         return response
     }
 
-    fun deleteMails(messageToDelete: MutableList<Int>) {
-        messageToDelete.forEach({mailRepository.delete(it.toLong())})
+    fun deleteMails(messageToDelete: MutableList<Long>) {
+        messageToDelete.forEach({mailRepository.delete(it)})
     }
 
     fun getUidl(user: String): String {
