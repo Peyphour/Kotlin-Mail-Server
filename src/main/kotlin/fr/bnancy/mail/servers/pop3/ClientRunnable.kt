@@ -1,10 +1,10 @@
 package fr.bnancy.mail.servers.pop3
 
+import fr.bnancy.mail.CRLFTerminatedReader
 import fr.bnancy.mail.servers.pop3.commands.Pop3AbstractCommand
 import fr.bnancy.mail.servers.pop3.data.Pop3ResponseCode
 import fr.bnancy.mail.servers.pop3.data.Pop3Session
 import fr.bnancy.mail.servers.pop3.data.Pop3SessionState
-import fr.bnancy.mail.servers.smtp.io.CRLFTerminatedReader
 import fr.bnancy.mail.service.Pop3Service
 import java.io.PrintWriter
 import javax.net.ssl.SSLSocket

@@ -1,12 +1,12 @@
 package fr.bnancy.mail.servers.smtp
 
+import fr.bnancy.mail.CRLFTerminatedReader
 import fr.bnancy.mail.getHostname
 import fr.bnancy.mail.servers.smtp.commands.SmtpAbstractCommand
 import fr.bnancy.mail.servers.smtp.data.LoginState
 import fr.bnancy.mail.servers.smtp.data.SmtpResponseCode
 import fr.bnancy.mail.servers.smtp.data.SmtpSession
 import fr.bnancy.mail.servers.smtp.data.SmtpSessionState
-import fr.bnancy.mail.servers.smtp.io.CRLFTerminatedReader
 import fr.bnancy.mail.servers.smtp.listeners.SmtpSessionListener
 import java.io.PrintWriter
 import java.net.InetSocketAddress
