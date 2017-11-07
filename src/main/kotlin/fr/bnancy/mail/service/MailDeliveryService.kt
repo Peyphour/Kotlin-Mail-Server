@@ -34,7 +34,7 @@ class MailDeliveryService {
     private val internalDeliveryQueue: LinkedList<SmtpSession> = LinkedList()
     private val tryLaterDeliveryQueue: LinkedList<Pair<SmtpSession, Long>> = LinkedList()
 
-    private val ONE_MINUTE_MILLIS = 1000 * 60 * 1
+    private val FIVE_MINUTE_MILLIS = 1000 * 60 * 5
 
     private val logger = Logger.getLogger(javaClass.simpleName)
 
@@ -101,7 +101,7 @@ class MailDeliveryService {
                 ).sendMail(email)
             } catch (e: Exception) {
                 logger.info("got exception ${e.message} will sending to ${smtpSession.to}")
-                tryLaterDeliveryQueue.add(smtpSession to (System.currentTimeMillis() + ONE_MINUTE_MILLIS))
+                tryLaterDeliveryQueue.add(smtpSession to (System.currentTimeMillis() + FIVE_MINUTE_MILLIS))
             }
         }
     }

@@ -39,6 +39,16 @@ class Pop3Service {
         return content
     }
 
+    fun getMailBoxStatistics(user: String) : String {
+        var totalMail = 0
+        var totalSize = 0
+        mailRepository.findBy()
+                .filter { it.getRecipients().contains(user) }
+                .also { totalMail = it.size }
+                .forEach { totalSize += getFullMailContent(it.getId()).length }
+        return "$totalMail $totalSize"
+    }
+
     fun getAllStatistics(user: String): String {
         var response = ""
         mailRepository.findBy()
@@ -52,5 +62,14 @@ class Pop3Service {
 
     fun deleteMails(messageToDelete: MutableList<Int>) {
         messageToDelete.forEach({mailRepository.delete(it.toLong())})
+    }
+
+    fun getUidl(user: String): String {
+        var response = ""
+        mailRepository.findBy()
+                .filter { it.getRecipients().contains(user) }
+                .forEach { response += it.getId().toString(10) + " " + it.getId().toString(10) + "\r\n"}
+        response += "."
+        return response
     }
 }

@@ -28,10 +28,13 @@ class ClientRunnable(private val clientSocket: SSLSocket, private val sessionTim
             val line = reader.readLine() ?: // Received EOF
                     break
 
+            println("RCV (POP3) $line")
+
             timeout = System.currentTimeMillis()
 
             val response = handleCommand(line, session, pop3Service)
 
+            println("SND (POP3) ${response.code}")
             write(out, response.code)
 
             if(session.currentState == Pop3SessionState.UPDATE) {
