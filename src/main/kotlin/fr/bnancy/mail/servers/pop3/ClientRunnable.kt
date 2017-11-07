@@ -6,8 +6,8 @@ import fr.bnancy.mail.servers.pop3.data.Pop3ResponseCode
 import fr.bnancy.mail.servers.pop3.data.Pop3Session
 import fr.bnancy.mail.servers.pop3.data.Pop3SessionState
 import fr.bnancy.mail.service.Pop3Service
+import org.apache.log4j.Logger
 import java.io.PrintWriter
-import java.util.logging.Logger
 import javax.net.ssl.SSLSocket
 
 class ClientRunnable(private val clientSocket: SSLSocket, private val sessionTimeout: Int, val commands: MutableMap<String,
@@ -32,7 +32,6 @@ class ClientRunnable(private val clientSocket: SSLSocket, private val sessionTim
                     break
 
             logger.info("RCV (POP3) $line")
-
             timeout = System.currentTimeMillis()
 
             val response = handleCommand(line, session, pop3Service)
