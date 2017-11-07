@@ -31,7 +31,7 @@ class Pop3Server {
 
     @PostConstruct
     fun init() {
-        val reflections = Reflections("fr.bnancy.mail.servers.imap.commands")
+        val reflections = Reflections("fr.bnancy.mail.servers.pop3.commands")
         reflections.getTypesAnnotatedWith(Pop3Command::class.java)
                 .forEach { commands.put(it.getAnnotation(Pop3Command::class.java).command, it.newInstance() as Pop3AbstractCommand) }
     }
