@@ -6,8 +6,8 @@ import fr.bnancy.mail.servers.pop3.data.Pop3ResponseCode
 import fr.bnancy.mail.servers.pop3.data.Pop3Session
 import fr.bnancy.mail.servers.pop3.data.Pop3SessionState
 import fr.bnancy.mail.service.Pop3Service
+import org.apache.log4j.Logger
 import java.io.PrintWriter
-import java.util.logging.Logger
 import javax.net.ssl.SSLSocket
 
 class ClientRunnable(private val clientSocket: SSLSocket, private val sessionTimeout: Int, val commands: MutableMap<String,
@@ -31,13 +31,10 @@ class ClientRunnable(private val clientSocket: SSLSocket, private val sessionTim
             val line = reader.readLine() ?: // Received EOF
                     break
 
-            logger.fine("RCV (POP3) $line")
-
             timeout = System.currentTimeMillis()
 
             val response = handleCommand(line, session, pop3Service)
 
-            logger.fine("SND (POP3) ${response.code}")
             write(out, response.code)
 
             if(session.currentState == Pop3SessionState.UPDATE) {
