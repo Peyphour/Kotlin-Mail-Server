@@ -11,6 +11,6 @@ class ListCommand: Pop3AbstractCommand {
     override fun execute(data: String, session: Pop3Session, pop3Service: Pop3Service): Pop3ResponseCode {
         if(session.currentState != Pop3SessionState.TRANSACTION)
             return Pop3ResponseCode.ERR("Unknown command")
-        return Pop3ResponseCode.OK("\r\n" + pop3Service.getAllStatistics(session.user))
+        return Pop3ResponseCode.OK(pop3Service.getAllStatistics(session.user))
     }
 }

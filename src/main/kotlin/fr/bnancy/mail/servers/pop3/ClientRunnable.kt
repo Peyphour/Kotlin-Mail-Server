@@ -31,13 +31,13 @@ class ClientRunnable(private val clientSocket: SSLSocket, private val sessionTim
             val line = reader.readLine() ?: // Received EOF
                     break
 
-            logger.fine("RCV (POP3) $line")
+            logger.info("RCV (POP3) $line")
 
             timeout = System.currentTimeMillis()
 
             val response = handleCommand(line, session, pop3Service)
 
-            logger.fine("SND (POP3) ${response.code}")
+            logger.info("SND (POP3) ${response.code}")
             write(out, response.code)
 
             if(session.currentState == Pop3SessionState.UPDATE) {

@@ -47,13 +47,13 @@ class ClientRunnable(private var clientSocket: Socket, val smtpListener: SmtpSes
             if(line == null) { // Received EOF
                 break
             }
-            logger.fine("RCV (SMTP) : $line")
+            logger.info("RCV (SMTP) : $line")
 
             val response = handleCommand(line, smtpSession)
 
             if(response != SmtpResponseCode.EMPTY) {
                 write(out, response.code)
-                logger.fine("SND (SMTP) : ${response.code}")
+                logger.info("SND (SMTP) : ${response.code}")
             }
 
             if(smtpSession.stateSmtp.contains(SmtpSessionState.TLS_STARTED) && (clientSocket !is SSLSocket)) { // Start TLS negotiation

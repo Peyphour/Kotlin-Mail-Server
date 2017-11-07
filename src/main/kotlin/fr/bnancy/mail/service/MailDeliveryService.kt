@@ -92,6 +92,11 @@ class MailDeliveryService {
             email.addRecipient(recipient, recipient, Message.RecipientType.TO)
             val headers: Array<Header> = jacksonObjectMapper().readValue(mail.headers)
 
+            headers.filter { !it.key.equals("From", true) }
+                    .filter { !it.key.equals("Subject", true) }
+                    .filter { !it.key.equals("To", true) }
+                    .forEach { email.addHeader(it.key, it.value) }
+
             email.subject = headers.find { it.key.equals("Subject", true) }!!.value
             email.textHTML = mail.content
             try {
