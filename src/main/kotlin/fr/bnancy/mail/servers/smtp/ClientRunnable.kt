@@ -7,14 +7,14 @@ import fr.bnancy.mail.servers.smtp.data.SmtpResponseCode
 import fr.bnancy.mail.servers.smtp.data.SmtpSession
 import fr.bnancy.mail.servers.smtp.data.SmtpSessionState
 import fr.bnancy.mail.servers.smtp.io.CRLFTerminatedReader
-import fr.bnancy.mail.servers.smtp.listeners.SessionListener
+import fr.bnancy.mail.servers.smtp.listeners.SmtpSessionListener
 import java.io.PrintWriter
 import java.net.InetSocketAddress
 import java.net.Socket
 import javax.net.ssl.SSLSocket
 import javax.net.ssl.SSLSocketFactory
 
-class ClientRunnable(private var clientSocket: Socket, val listener: SessionListener, private val sessionTimeout: Int, val commands: MutableMap<String, SmtpAbstractCommand>): Runnable {
+class ClientRunnable(private var clientSocket: Socket, val smtpListener: SmtpSessionListener, private val sessionTimeout: Int, val commands: MutableMap<String, SmtpAbstractCommand>): Runnable {
 
     private var running: Boolean = true
     val smtpSession: SmtpSession = SmtpSession()
@@ -27,7 +27,7 @@ class ClientRunnable(private var clientSocket: Socket, val listener: SessionList
         var timeout: Long = System.currentTimeMillis()
 
         smtpSession.netAddress = this.clientSocket.inetAddress.hostAddress
-        listener.sessionOpened(smtpSession)
+        smtpListener.sessionOpened(smtpSession)
 
         if(clientSocket is SSLSocket) {
             smtpSession.secured = true
@@ -69,7 +69,7 @@ class ClientRunnable(private var clientSocket: Socket, val listener: SessionList
             running = !smtpSession.stateSmtp.contains(SmtpSessionState.QUIT)
 
             if (smtpSession.stateSmtp.contains(SmtpSessionState.DATA) && !smtpSession.delivered) {
-                listener.deliverMail(smtpSession)
+                smtpListener.deliverMail(smtpSession)
                 smtpSession.delivered = true
                 resetSession()
             }
@@ -77,7 +77,7 @@ class ClientRunnable(private var clientSocket: Socket, val listener: SessionList
         }
 
         clientSocket.close()
-        listener.sessionClosed(smtpSession)
+        smtpListener.sessionClosed(smtpSession)
     }
 
     private fun write(out: PrintWriter, s: String) {
@@ -119,10 +119,10 @@ class ClientRunnable(private var clientSocket: Socket, val listener: SessionList
 
         val command: SmtpAbstractCommand? = commands[commandString]
         return when {
-            smtpSession.receivingData -> commands["DATA"]!!.execute(data, smtpSession, listener)
-            smtpSession.loginState.contains(LoginState.LOGIN_IN_PROGRESS) -> commands["AUTH"]!!.execute(data, smtpSession, listener)
+            smtpSession.receivingData -> commands["DATA"]!!.execute(data, smtpSession, smtpListener)
+            smtpSession.loginState.contains(LoginState.LOGIN_IN_PROGRESS) -> commands["AUTH"]!!.execute(data, smtpSession, smtpListener)
             command != null -> command
-                    .execute(data, smtpSession, listener)
+                    .execute(data, smtpSession, smtpListener)
             else -> SmtpResponseCode.UNKNOWN_COMMAND("Unknown command : $commandString")
         }
     }

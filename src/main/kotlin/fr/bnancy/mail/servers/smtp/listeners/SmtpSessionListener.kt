@@ -2,7 +2,7 @@ package fr.bnancy.mail.servers.smtp.listeners
 
 import fr.bnancy.mail.servers.smtp.data.SmtpSession
 
-interface SessionListener {
+interface SmtpSessionListener {
     fun sessionOpened(smtpSession: SmtpSession)
     fun sessionClosed(smtpSession: SmtpSession)
     fun deliverMail(smtpSession: SmtpSession)

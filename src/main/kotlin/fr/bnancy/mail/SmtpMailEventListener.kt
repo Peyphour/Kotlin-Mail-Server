@@ -3,7 +3,7 @@ package fr.bnancy.mail
 import fr.bnancy.mail.repository.UserRepository
 import fr.bnancy.mail.servers.smtp.data.SmtpSession
 import fr.bnancy.mail.servers.smtp.data.SmtpSessionState
-import fr.bnancy.mail.servers.smtp.listeners.SessionListener
+import fr.bnancy.mail.servers.smtp.listeners.SmtpSessionListener
 import fr.bnancy.mail.service.IpBlacklistService
 import fr.bnancy.mail.service.MailDeliveryService
 import fr.bnancy.mail.service.UserService
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component
 import java.util.logging.Logger
 
 @Component
-class MailEventListener: SessionListener {
+class SmtpMailEventListener : SmtpSessionListener {
 
     @Autowired
     private lateinit var mailDeliveryService: MailDeliveryService

@@ -4,11 +4,11 @@ import fr.bnancy.mail.servers.smtp.commands.annotations.SmtpCommand
 import fr.bnancy.mail.servers.smtp.data.SmtpSession
 import fr.bnancy.mail.servers.smtp.data.SmtpSessionState
 import fr.bnancy.mail.servers.smtp.data.SmtpResponseCode
-import fr.bnancy.mail.servers.smtp.listeners.SessionListener
+import fr.bnancy.mail.servers.smtp.listeners.SmtpSessionListener
 
 @SmtpCommand("MAIL")
 class MailCommand: SmtpAbstractCommand {
-    override fun execute(data: String, smtpSession: SmtpSession, listener: SessionListener): SmtpResponseCode {
+    override fun execute(data: String, smtpSession: SmtpSession, smtpListener: SmtpSessionListener): SmtpResponseCode {
 
         if(!smtpSession.stateSmtp.contains(SmtpSessionState.HELO))
             return SmtpResponseCode.BAD_SEQUENCE("Must issue HELO/EHLO first.")
@@ -22,7 +22,7 @@ class MailCommand: SmtpAbstractCommand {
         val mailRegex = Regex("<(.*)>")
         val address = mailRegex.find(data)!!.groupValues[1]
 
-        if(!listener.acceptSender(address))
+        if(!smtpListener.acceptSender(address))
             return SmtpResponseCode.MAILBOX_UNAVAILABLE("$address isn't authorized to send mail here")
 
         smtpSession.from = address

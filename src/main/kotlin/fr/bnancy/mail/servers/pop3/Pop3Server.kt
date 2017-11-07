@@ -3,6 +3,7 @@ package fr.bnancy.mail.servers.pop3
 import fr.bnancy.mail.config.Pop3ServerConfig
 import fr.bnancy.mail.servers.pop3.commands.Pop3AbstractCommand
 import fr.bnancy.mail.servers.pop3.commands.annotations.Pop3Command
+import fr.bnancy.mail.service.Pop3Service
 import org.reflections.Reflections
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.scheduling.annotation.Scheduled
@@ -19,6 +20,9 @@ class Pop3Server {
 
     @Autowired
     lateinit var pop3Config: Pop3ServerConfig
+
+    @Autowired
+    lateinit var pop3Service: Pop3Service
 
     lateinit var sslServerSocket: SSLServerSocket
 
@@ -42,7 +46,7 @@ class Pop3Server {
         Thread({
             while(running) {
                 val client: SSLSocket = sslServerSocket.accept() as SSLSocket
-                clients.add(ClientRunnable(client, pop3Config.sessionTimeout, commands))
+                clients.add(ClientRunnable(client, pop3Config.sessionTimeout, commands, pop3Service))
                 Thread(clients[clients.size - 1], "client-runnable-${client.inetAddress.hostName}").start()
             }
         }, "pop3-server").start()

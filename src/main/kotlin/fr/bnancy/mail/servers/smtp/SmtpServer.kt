@@ -3,7 +3,7 @@ package fr.bnancy.mail.servers.smtp
 import fr.bnancy.mail.config.SmtpServerConfig
 import fr.bnancy.mail.servers.smtp.commands.SmtpAbstractCommand
 import fr.bnancy.mail.servers.smtp.commands.annotations.SmtpCommand
-import fr.bnancy.mail.servers.smtp.listeners.SessionListener
+import fr.bnancy.mail.servers.smtp.listeners.SmtpSessionListener
 import org.reflections.Reflections
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.scheduling.annotation.Scheduled
@@ -21,7 +21,7 @@ class SmtpServer {
     lateinit var configSmtp: SmtpServerConfig
 
     @Autowired
-    lateinit var listener: SessionListener
+    lateinit var smtpListener: SmtpSessionListener
 
     lateinit var socketServer: ServerSocket
 
@@ -46,7 +46,7 @@ class SmtpServer {
         Thread({
             while(running) {
                 val client: Socket = this.socketServer.accept()
-                clients.add(ClientRunnable(client, listener, configSmtp.sessionTimeout, commands))
+                clients.add(ClientRunnable(client, smtpListener, configSmtp.sessionTimeout, commands))
                 Thread(clients[clients.size - 1], "client-runnable-${client.inetAddress.hostName}").start()
             }
             println("server closed")

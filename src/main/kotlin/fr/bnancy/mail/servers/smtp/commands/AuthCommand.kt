@@ -5,13 +5,13 @@ import fr.bnancy.mail.servers.smtp.data.LoginState
 import fr.bnancy.mail.servers.smtp.data.SmtpSession
 import fr.bnancy.mail.servers.smtp.data.SmtpSessionState
 import fr.bnancy.mail.servers.smtp.data.SmtpResponseCode
-import fr.bnancy.mail.servers.smtp.listeners.SessionListener
+import fr.bnancy.mail.servers.smtp.listeners.SmtpSessionListener
 import java.nio.charset.Charset
 import java.util.*
 
 @SmtpCommand("AUTH", arrayOf("submission"))
 class AuthCommand : SmtpAbstractCommand {
-    override fun execute(data: String, smtpSession: SmtpSession, listener: SessionListener): SmtpResponseCode {
+    override fun execute(data: String, smtpSession: SmtpSession, smtpListener: SmtpSessionListener): SmtpResponseCode {
         if(!smtpSession.secured)
             return SmtpResponseCode.BAD_SEQUENCE("Must issue STARTTLS first")
 
@@ -35,7 +35,7 @@ class AuthCommand : SmtpAbstractCommand {
         } else if (smtpSession.loginState.contains(LoginState.USERNAME_TRANSMITTED) && smtpSession.loginState.contains(LoginState.PASSWORD_TRANSMITTED)) {
             val password = Base64.getDecoder().decode(data).toString(Charset.forName("UTF-8"))
             smtpSession.loginState.clear()
-            return if(listener.isValidUser(smtpSession, password))
+            return if(smtpListener.isValidUser(smtpSession, password))
                 SmtpResponseCode.AUTH_OK("Welcome back ${smtpSession.loginUsername}")
             else
                 SmtpResponseCode.INVALID("Invalid user/password")
