@@ -60,20 +60,26 @@ class MailDeliveryService {
     fun deliverExternalMail() {
         val session = externalDeliveryQueue.poll() ?: return
         logger.info("Delivering external mail $session")
-        sendMail(session)
+        sendMail(session).forEach { // Add each session in error to later delivery queue
+            tryLaterDeliveryQueue.add(it to System.currentTimeMillis() + FIVE_MINUTE_MILLIS)
+        }
     }
 
     @Scheduled(fixedDelay = 1000, initialDelay = 1000)
     fun tryDeliverAgain() {
         val found = mutableListOf<Pair<SmtpSession, Long>>()
+        val sessionInError = mutableListOf<SmtpSession>()
         for((session, time) in tryLaterDeliveryQueue) {
-            if(time >= System.currentTimeMillis()) {
+            if(time <= System.currentTimeMillis()) {
                 logger.info("New delivery for $session (time : $time)")
-                sendMail(session)
+                sessionInError.addAll(sendMail(session))
                 found.add(session to time)
             }
         }
         tryLaterDeliveryQueue.removeAll(found)
+        sessionInError.forEach {
+            tryLaterDeliveryQueue.add(it to System.currentTimeMillis() + FIVE_MINUTE_MILLIS)
+        }
     }
 
     private fun doMxLookup(domain: String): String {
@@ -81,10 +87,14 @@ class MailDeliveryService {
         lookups.sortBy { it -> (it as MXRecord).priority }
         return (lookups[0] as MXRecord).target.toString(true)
     }
-
-    private fun sendMail(smtpSession: SmtpSession) {
-        val mail = Mail(smtpSession).toEntity()
-
+    /**
+     * Send an email
+     * @param session the session to send
+     * @return a list of SmtpSession in error to attempt later delivery
+     */
+    private fun sendMail(session: SmtpSession): List<SmtpSession> {
+        val mail = Mail(session).toEntity()
+        val sessionInError = mutableListOf<SmtpSession>()
         for(recipient in mail.recipients) {
             val email = Email()
             email.setFromAddress(mail.sender, mail.sender)
@@ -105,9 +115,10 @@ class MailDeliveryService {
                         TransportStrategy.SMTP_TLS
                 ).sendMail(email)
             } catch (e: Exception) {
-                logger.info("got exception ${e.message} will sending to ${smtpSession.to}")
-                tryLaterDeliveryQueue.add(smtpSession to (System.currentTimeMillis() + FIVE_MINUTE_MILLIS))
+                logger.info("got exception ${e.message} will sending to ${session.to}")
+                sessionInError.add(session.copy(to = arrayListOf(recipient))) // Copy to the recipient in error
             }
         }
+        return sessionInError
     }
 }
