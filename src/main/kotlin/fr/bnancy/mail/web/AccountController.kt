@@ -25,4 +25,10 @@ class AccountController {
         userService.createUser(mail, pass, role)
         return "redirect:/admin"
     }
+
+    @RequestMapping("/admin/deleteAccount", method = arrayOf(RequestMethod.POST))
+    fun deleteAccount(@RequestParam mail: String): String {
+        userService.deleteUser(mail)
+        return "redirect:/admin"
+    }
 }

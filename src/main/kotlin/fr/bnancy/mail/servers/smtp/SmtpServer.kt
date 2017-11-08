@@ -42,7 +42,13 @@ class SmtpServer {
 
     fun start() {
         this.running = true
-        this.socketServer = ServerSocket(this.configSmtp.port)
+        try {
+            this.socketServer = ServerSocket(this.configSmtp.port)
+        } catch(e: Exception) {
+            logger.severe("Couldn't start SMTP server : ${e.message}")
+            this.running = false
+            return
+        }
         Thread({
             while(running) {
                 val client: Socket = this.socketServer.accept()

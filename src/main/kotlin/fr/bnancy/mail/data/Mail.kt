@@ -16,5 +16,6 @@ data class Mail(
         @Lob
         var content: String = "",
         var date: Date = Date.from(Instant.now()),
-        var secured: Boolean = false
+        var secured: Boolean = false,
+        var seen: Boolean = false
 )

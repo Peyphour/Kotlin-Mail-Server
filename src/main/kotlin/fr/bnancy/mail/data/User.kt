@@ -10,6 +10,7 @@ data class User(
         @GeneratedValue(strategy = GenerationType.AUTO)
         var id: Long = 0,
 
+        @Column(unique = true)
         var mail: String= "",
 
         var password: String = "",

@@ -62,29 +62,37 @@
 <div class="container">
 
     <div class="starter-template">
-        <div th:each="status : ${serversStatus}">
-            <p th:class="'bg-' + ${status.value ? 'success' : 'danger'}"
-               th:text="${status.key} + ' server status : ' + ${status.value ? 'Running' : 'Stopped'} + '!'"></p>
-            <form method="post" action="/admin/start-server">
-                <input
-                        type="hidden"
-                        th:name="${_csrf.parameterName}"
-                        th:value="${_csrf.token}"/>
-                <input name="server" type="hidden" th:value="${status.key}" />
-                <button>Start server</button>
-            </form>
-            <form method="post" action="/admin/stop-server">
-                <input
-                        type="hidden"
-                        th:name="${_csrf.parameterName}"
-                        th:value="${_csrf.token}"/>
-                <input name="server" type="hidden" th:value="${status.key}" />
-                <button>Stop server</button>
-            </form>
+        <div class="row">
+            <div th:each="status : ${serversStatus}" th:class="'col-sm-' + ${12 / serverNumber} + ' bg-' + ${status.value ? 'success' : 'danger'}">
+                <p th:text="${status.key} + ' server status : ' + ${status.value ? 'Running' : 'Stopped'} + '!'"></p>
+                <form method="post" action="/admin/start-server">
+                    <input
+                            type="hidden"
+                            th:name="${_csrf.parameterName}"
+                            th:value="${_csrf.token}"/>
+                    <input name="server" type="hidden" th:value="${status.key}" />
+                    <button>Start server</button>
+                </form>
+                <form method="post" action="/admin/stop-server">
+                    <input
+                            type="hidden"
+                            th:name="${_csrf.parameterName}"
+                            th:value="${_csrf.token}"/>
+                    <input name="server" type="hidden" th:value="${status.key}" />
+                    <button>Stop server</button>
+                </form>
+            </div>
         </div>
         <h3>Mail addresses in the system: </h3>
         <div th:each="user : ${users}">
             <span th:text="${user.mail} + ' / ' + ${user.authorities}"></span> <br/>
+            <form method="post" action="/admin/deleteAccount">
+                <input type="hidden" name="mail" th:value="${user.mail}" />
+                <input type="hidden"
+                        th:name="${_csrf.parameterName}"
+                        th:value="${_csrf.token}"/>
+                <input type="submit" value="Delete this account" />
+            </form>
         </div>
         <hr/>
         <div>

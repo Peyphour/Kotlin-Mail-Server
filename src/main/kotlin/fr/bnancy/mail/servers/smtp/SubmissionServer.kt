@@ -43,7 +43,13 @@ class SubmissionServer {
 
     fun start() {
         this.running = true
-        this.sslServerSocket = SSLServerSocketFactory.getDefault().createServerSocket(configSubmission.port) as SSLServerSocket
+        try {
+            this.sslServerSocket = SSLServerSocketFactory.getDefault().createServerSocket(configSubmission.port) as SSLServerSocket
+        } catch(e: Exception) {
+            logger.severe("Couldn't start Submission server : ${e.message}")
+            this.running = false
+            return
+        }
         Thread({
             while(running) {
                 val client: Socket = this.sslServerSocket.accept()

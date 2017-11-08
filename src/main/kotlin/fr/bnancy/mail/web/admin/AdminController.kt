@@ -35,6 +35,7 @@ class AdminController {
                 "submission" to submissionServer.isRunning(),
                 "pop3" to pop3Server.isRunning()
         ))
+        model.addAttribute("serverNumber", 3)
         model.addAttribute("users", userService.getAllUsers())
         model.addAttribute("roles", UserAuthority.values())
         return "admin/index"
@@ -76,10 +77,5 @@ class AdminController {
             }
         }
         return "redirect:/admin"
-    }
-
-    @RequestMapping("/account", method = arrayOf(RequestMethod.POST))
-    fun createAccount(@RequestParam("mail") mail: String, @RequestParam("pass") pass: String) {
-
     }
 }

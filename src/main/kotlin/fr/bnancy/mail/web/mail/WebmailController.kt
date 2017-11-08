@@ -9,7 +9,6 @@ import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
 
 @Controller
 @RequestMapping("/mails")
@@ -22,7 +21,8 @@ class WebmailController {
     fun getMails(model: Model, auth: Authentication): String {
         val email = (auth.principal as UserDetails).username
         val mails = mailRepository.findBy().filter { it.getRecipients().contains(email) }
-                .map { it -> MailSummary(it.getId(), it.getHeaders()) }
+                .sortedByDescending { it.getId() }
+                .map { it -> MailSummary(it.getId(), it.getHeaders(), it.getSeen()) }
         model.addAttribute("mails", mails)
         return "mail/index"
     }
@@ -35,6 +35,8 @@ class WebmailController {
             return "redirect:/mails"
         }
         model.addAttribute("mail", mail)
+        mail.seen = true
+        mailRepository.save(mail)
         return "mail/mail"
     }
 }

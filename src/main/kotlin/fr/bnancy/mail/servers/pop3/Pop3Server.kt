@@ -42,7 +42,13 @@ class Pop3Server {
 
     fun start() {
         this.running = true
-        this.sslServerSocket = SSLServerSocketFactory.getDefault().createServerSocket(pop3Config.port) as SSLServerSocket
+        try {
+            this.sslServerSocket = SSLServerSocketFactory.getDefault().createServerSocket(pop3Config.port) as SSLServerSocket
+        } catch(e: Exception) {
+            logger.severe("Couldn't start POP3 server : ${e.message}")
+            this.running = false
+            return
+        }
         Thread({
             while(running) {
                 val client: SSLSocket = sslServerSocket.accept() as SSLSocket
