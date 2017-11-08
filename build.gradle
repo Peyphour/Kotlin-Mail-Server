@@ -44,5 +44,6 @@ dependencies {
     compile "com.fasterxml.jackson.module:jackson-module-kotlin:2.9.0"
     compile group: 'dnsjava', name: 'dnsjava', version: '2.1.8'
     compile group: 'org.simplejavamail', name: 'simple-java-mail', version: '4.3.0'
+    compile("com.h2database:h2:1.4.194")
     testCompile('org.springframework.boot:spring-boot-starter-test')
 }
