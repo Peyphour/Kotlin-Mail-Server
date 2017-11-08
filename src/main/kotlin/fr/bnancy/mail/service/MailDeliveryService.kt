@@ -34,7 +34,7 @@ class MailDeliveryService {
     private val internalDeliveryQueue: LinkedList<Session> = LinkedList()
     private val tryLaterDeliveryQueue: LinkedList<Pair<Session, Long>> = LinkedList()
 
-    private val ONE_MINUTE_MILLIS = 1000 * 60 * 1
+    private val FIVE_MINUTE_MILLIS = 1000 * 60 * 5
 
     private val logger = Logger.getLogger(javaClass.simpleName)
 
@@ -60,20 +60,26 @@ class MailDeliveryService {
     fun deliverExternalMail() {
         val session = externalDeliveryQueue.poll() ?: return
         logger.info("Delivering external mail $session")
-        sendMail(session)
+        sendMail(session).forEach { // Add each session in error to later delivery queue
+            tryLaterDeliveryQueue.add(it to System.currentTimeMillis() + FIVE_MINUTE_MILLIS)
+        }
     }
 
     @Scheduled(fixedDelay = 1000, initialDelay = 1000)
     fun tryDeliverAgain() {
         val found = mutableListOf<Pair<Session, Long>>()
+        val sessionInError = mutableListOf<Session>()
         for((session, time) in tryLaterDeliveryQueue) {
-            if(time >= System.currentTimeMillis()) {
+            if(time <= System.currentTimeMillis()) {
                 logger.info("New delivery for $session (time : $time)")
-                sendMail(session)
+                sessionInError.addAll(sendMail(session))
                 found.add(session to time)
             }
         }
         tryLaterDeliveryQueue.removeAll(found)
+        sessionInError.forEach {
+            tryLaterDeliveryQueue.add(it to System.currentTimeMillis() + FIVE_MINUTE_MILLIS)
+        }
     }
 
     private fun doMxLookup(domain: String): String {
@@ -82,9 +88,14 @@ class MailDeliveryService {
         return (lookups[0] as MXRecord).target.toString(true)
     }
 
-    private fun sendMail(session: Session) {
+    /**
+     * Send an email
+     * @param smtpSession the session to send
+     * @return a list of SmtpSession in error to attempt later delivery
+     */
+    private fun sendMail(session: Session): List<Session> {
         val mail = Mail(session).toEntity()
-
+        val sessionInError = mutableListOf<Session>()
         for(recipient in mail.recipients) {
             val email = Email()
             email.setFromAddress(mail.sender, mail.sender)
@@ -101,8 +112,9 @@ class MailDeliveryService {
                 ).sendMail(email)
             } catch (e: Exception) {
                 logger.info("got exception ${e.message} will sending to ${session.to}")
-                tryLaterDeliveryQueue.add(session to (System.currentTimeMillis() + ONE_MINUTE_MILLIS))
+                sessionInError.add(session.copy(to = arrayListOf(recipient))) // Copy to the recipient in error
             }
         }
+        return sessionInError
     }
 }
