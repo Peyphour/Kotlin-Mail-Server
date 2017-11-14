@@ -4,4 +4,4 @@
 |  |\/|  |   /  /_\  \   |  | |  |            \   \    |   __|  |      /       \      /   |   __|  |      /
 |  |  |  |  /  _____  \  |  | |  `----.   .----)   |   |  |____ |  |\  \----.   \    /    |  |____ |  |\  \----.
 |__|  |__| /__/     \__\ |__| |_______|   |_______/    |_______|| _| `._____|    \__/     |_______|| _| `._____|
-Spring-Boot V${spring-boot.version}
+Running ${application.title}${application.formatted-version} with Spring-Boot${spring-boot.formatted-version}
