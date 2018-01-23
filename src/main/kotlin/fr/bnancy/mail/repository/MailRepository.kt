@@ -8,5 +8,5 @@ import org.springframework.data.repository.CrudRepository
 
 interface MailRepository: CrudRepository<Mail, Long> {
     @Query("SELECT s.headers as headers, s.recipients as recipients, s.id as id, s.seen as seen from Mail s")
-    fun findBy(): Iterable<MailProjection>
+    fun findMailSummaries(): Iterable<MailProjection>
 }

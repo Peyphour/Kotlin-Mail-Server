@@ -20,7 +20,7 @@ class WebmailController {
     @RequestMapping
     fun getMails(model: Model, auth: Authentication): String {
         val email = (auth.principal as UserDetails).username
-        val mails = mailRepository.findBy().filter { it.getRecipients().contains(email) }
+        val mails = mailRepository.findMailSummaries().filter { it.getRecipients().contains(email) }
                 .sortedByDescending { it.getId() }
                 .map { it -> MailSummary(it.getId(), it.getHeaders(), it.getSeen()) }
         model.addAttribute("mails", mails)

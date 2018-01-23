@@ -42,7 +42,7 @@ class Pop3Service {
     fun getMailBoxStatistics(user: String) : String {
         var totalMail = 0
         var totalSize = 0
-        mailRepository.findBy()
+        mailRepository.findMailSummaries()
                 .filter { it.getRecipients().contains(user) }
                 .also { totalMail = it.size }
                 .forEach { totalSize += getFullMailContent(it.getId()).length }
@@ -51,7 +51,7 @@ class Pop3Service {
 
     fun getAllStatistics(user: String): String {
         var response = ""
-        mailRepository.findBy()
+        mailRepository.findMailSummaries()
                 .filter { it.getRecipients().contains(user) }
                 .also { response += it.size.toString(10) + " messages:\r\n"}
                 .map { mailRepository.findOne(it.getId()) }
@@ -66,7 +66,7 @@ class Pop3Service {
 
     fun getUidl(user: String): String {
         var response = ""
-        mailRepository.findBy()
+        mailRepository.findMailSummaries()
                 .filter { it.getRecipients().contains(user) }
                 .forEach { response += it.getId().toString(10) + " " + it.getId().toString(10) + "\r\n"}
         response += "."
