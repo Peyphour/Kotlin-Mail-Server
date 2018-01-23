@@ -108,7 +108,15 @@ class MailDeliveryService {
                     .forEach { email.addHeader(it.key, it.value) }
 
             email.subject = headers.find { it.key.equals("Subject", true) }!!.value
-            email.textHTML = mail.content
+
+            val contentTypeHeader: Header = headers.find { it.key.equals("Content-Type", true) }!!
+
+            if(contentTypeHeader.value.contains("text/plain", true)) {
+                email.text = mail.content
+            } else {
+                email.textHTML = mail.content
+            }
+
             try {
                 Mailer(
                         ServerConfig(doMxLookup(recipient.split("@")[1]), 25),
