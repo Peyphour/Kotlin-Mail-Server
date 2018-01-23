@@ -6,7 +6,7 @@ import fr.bnancy.mail.servers.pop3.data.Pop3ResponseCode
 import fr.bnancy.mail.servers.pop3.data.Pop3Session
 import fr.bnancy.mail.servers.pop3.data.Pop3SessionState
 import fr.bnancy.mail.service.Pop3Service
-import org.apache.log4j.Logger
+import org.slf4j.LoggerFactory
 import java.io.PrintWriter
 import javax.net.ssl.SSLSocket
 
@@ -17,7 +17,7 @@ class ClientRunnable(private val clientSocket: SSLSocket, private val sessionTim
     private val lineSeparator = "\r\n"
     private val session: Pop3Session = Pop3Session()
 
-    private val logger = Logger.getLogger(javaClass.simpleName + " - ${clientSocket.inetAddress.hostAddress}")
+    private val logger = LoggerFactory.getLogger(javaClass.simpleName + " - ${clientSocket.inetAddress.hostAddress}")
 
     override fun run() {
 
@@ -31,12 +31,12 @@ class ClientRunnable(private val clientSocket: SSLSocket, private val sessionTim
             val line = reader.readLine() ?: // Received EOF
                     break
 
-            logger.info("RCV (POP3) $line")
+            logger.debug("RCV (POP3) $line")
             timeout = System.currentTimeMillis()
 
             val response = handleCommand(line, session, pop3Service)
 
-            logger.info("SND (POP3) ${response.code}")
+            logger.debug("SND (POP3) ${response.code}")
             write(out, response.code)
 
             if(session.currentState == Pop3SessionState.UPDATE) {
