@@ -111,7 +111,6 @@ class MailDeliveryService {
 
             val contentTypeHeader: Header = headers.find { it.key.equals("Content-Type", true) }!!
 
-            logger.warning("Content-type : " + contentTypeHeader.value.contains("text/plain", true))
             if(contentTypeHeader.value.contains("text/plain", true)) {
                 email.text = mail.content
             } else {
