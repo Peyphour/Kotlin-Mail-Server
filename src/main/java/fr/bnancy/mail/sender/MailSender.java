@@ -7,9 +7,11 @@ import fr.bnancy.mail.CRLFTerminatedReader;
 import fr.bnancy.mail.data.Mail;
 import fr.bnancy.mail.servers.smtp.data.Header;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import org.simplejavamail.mailer.config.ServerConfig;
@@ -36,7 +38,7 @@ public class MailSender {
       Socket socket = new Socket(config.getHost(), config.getPort());
 
       reader = new CRLFTerminatedReader(socket.getInputStream());
-      writer = new PrintWriter(socket.getOutputStream());
+      writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8));
 
       except("220", read(reader));
 
