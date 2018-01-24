@@ -12,6 +12,8 @@ import java.net.Socket;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import org.simplejavamail.mailer.config.ServerConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MailSender {
 
@@ -19,6 +21,7 @@ public class MailSender {
   private ServerConfig config;
   private CRLFTerminatedReader reader;
   private PrintWriter writer;
+  private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
   public MailSender(Mail content, ServerConfig config) {
     this.content = content;
@@ -27,12 +30,13 @@ public class MailSender {
 
   public boolean send() {
     try {
+      logger.info("Connecting to {}", config);
       Socket socket = new Socket(config.getHost(), config.getPort());
 
       reader = new CRLFTerminatedReader(socket.getInputStream());
       writer = new PrintWriter(socket.getOutputStream());
 
-      System.out.println(read(reader));
+      except("250", read(reader));
 
       final String helloResponse = ehlo();
 
@@ -61,6 +65,7 @@ public class MailSender {
       data();
       quit();
 
+      logger.info("Closing connection to {}. Mail delivered successfully.", config);
       socket.close();
 
     } catch (IOException e) {

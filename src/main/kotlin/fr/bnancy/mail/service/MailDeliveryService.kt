@@ -6,6 +6,7 @@ import fr.bnancy.mail.sender.MailSender
 import fr.bnancy.mail.servers.smtp.data.Mail
 import fr.bnancy.mail.servers.smtp.data.SmtpSession
 import org.simplejavamail.mailer.config.ServerConfig
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
@@ -13,7 +14,6 @@ import org.xbill.DNS.Lookup
 import org.xbill.DNS.MXRecord
 import org.xbill.DNS.Type
 import java.util.*
-import java.util.logging.Logger
 
 @Service
 class MailDeliveryService {
@@ -30,10 +30,10 @@ class MailDeliveryService {
 
     private val FIVE_MINUTE_MILLIS = 1000 * 60 * 5
 
-    private val logger = Logger.getLogger(javaClass.simpleName)
+    private val logger = LoggerFactory.getLogger(javaClass.simpleName)
 
     fun queueDelivery(smtpSession: SmtpSession) {
-        logger.info("queuing delivery $smtpSession")
+        logger.debug("queuing delivery $smtpSession")
         for (recipient in smtpSession.to) {
             if (userRepository.findByMail(recipient) == null) {
                 externalDeliveryQueue.add(smtpSession.copy(to = arrayListOf(recipient)))
@@ -46,14 +46,14 @@ class MailDeliveryService {
     @Scheduled(fixedDelay = 100, initialDelay = 1000)
     fun deliverInternalMail() {
         val session = internalDeliveryQueue.poll() ?: return
-        logger.info("Delivering internal mail $session")
+        logger.debug("Delivering internal mail $session")
         mailRepository.save(Mail(session).toEntity())
     }
 
     @Scheduled(fixedDelay = 1000, initialDelay = 1000)
     fun deliverExternalMail() {
         val session = externalDeliveryQueue.poll() ?: return
-        logger.info("Delivering external mail $session")
+        logger.debug("Delivering external mail $session")
         sendMail(session).forEach {
             // Add each session in error to later delivery queue
             tryLaterDeliveryQueue.add(it to System.currentTimeMillis() + FIVE_MINUTE_MILLIS)
@@ -66,7 +66,7 @@ class MailDeliveryService {
         val sessionInError = mutableListOf<SmtpSession>()
         for ((session, time) in tryLaterDeliveryQueue) {
             if (time <= System.currentTimeMillis()) {
-                logger.info("New delivery for $session (time : $time)")
+                logger.debug("New delivery for $session (time : $time)")
                 sessionInError.addAll(sendMail(session))
                 found.add(session to time)
             }
@@ -98,7 +98,7 @@ class MailDeliveryService {
                         ServerConfig(doMxLookup(recipient.split("@")[1]), 25)
                 ).send()
             } catch (e: Exception) {
-                logger.info("got exception ${e.message} will sending to ${session.to}")
+                logger.error("got exception ${e.message} will sending to ${session.to}")
                 sessionInError.add(session.copy(to = arrayListOf(recipient))) // Copy to the recipient in error
             }
         }
