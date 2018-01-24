@@ -35,7 +35,7 @@ class MailDeliveryService {
     fun queueDelivery(smtpSession: SmtpSession) {
         logger.info("queuing delivery $smtpSession")
         for (recipient in smtpSession.to) {
-            if(userRepository.findByMail(recipient) == null) {
+            if (userRepository.findByMail(recipient) == null) {
                 externalDeliveryQueue.add(smtpSession.copy(to = arrayListOf(recipient)))
             } else {
                 internalDeliveryQueue.add(smtpSession.copy(to = arrayListOf(recipient)))
@@ -54,7 +54,8 @@ class MailDeliveryService {
     fun deliverExternalMail() {
         val session = externalDeliveryQueue.poll() ?: return
         logger.info("Delivering external mail $session")
-        sendMail(session).forEach { // Add each session in error to later delivery queue
+        sendMail(session).forEach {
+            // Add each session in error to later delivery queue
             tryLaterDeliveryQueue.add(it to System.currentTimeMillis() + FIVE_MINUTE_MILLIS)
         }
     }
@@ -63,8 +64,8 @@ class MailDeliveryService {
     fun tryDeliverAgain() {
         val found = mutableListOf<Pair<SmtpSession, Long>>()
         val sessionInError = mutableListOf<SmtpSession>()
-        for((session, time) in tryLaterDeliveryQueue) {
-            if(time <= System.currentTimeMillis()) {
+        for ((session, time) in tryLaterDeliveryQueue) {
+            if (time <= System.currentTimeMillis()) {
                 logger.info("New delivery for $session (time : $time)")
                 sessionInError.addAll(sendMail(session))
                 found.add(session to time)
@@ -81,6 +82,7 @@ class MailDeliveryService {
         lookups.sortBy { it -> (it as MXRecord).priority }
         return (lookups[0] as MXRecord).target.toString(true)
     }
+
     /**
      * Send an email
      * @param session the session to send
@@ -89,28 +91,7 @@ class MailDeliveryService {
     private fun sendMail(session: SmtpSession): List<SmtpSession> {
         val mail = Mail(session).toEntity()
         val sessionInError = mutableListOf<SmtpSession>()
-        for(recipient in mail.recipients) {
-//            val email = Email()
-//            email.setFromAddress(mail.sender, mail.sender)
-//            email.setReplyToAddress(mail.sender, mail.sender)
-//            email.addRecipient(recipient, recipient, Message.RecipientType.TO)
-//            val headers: Array<Header> = jacksonObjectMapper().readValue(mail.headers)
-//
-//            headers.filter { !it.key.equals("From", true) }
-//                    .filter { !it.key.equals("Subject", true) }
-//                    .filter { !it.key.equals("To", true) }
-//                    .forEach { email.addHeader(it.key, it.value) }
-//
-//            email.subject = headers.find { it.key.equals("Subject", true) }!!.value
-//
-//            val contentTypeHeader: Header = headers.find { it.key.equals("Content-Type", true) }!!
-//
-//            if(contentTypeHeader.value.contains("text/plain", true)) {
-//                email.text = mail.content
-//            } else {
-//                email.textHTML = mail.content
-//            }
-
+        for (recipient in mail.recipients) {
             try {
                 MailSender(
                         mail.copy(recipients = arrayListOf(recipient)),
