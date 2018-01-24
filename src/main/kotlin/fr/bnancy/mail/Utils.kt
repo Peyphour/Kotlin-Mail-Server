@@ -1,10 +1,8 @@
 package fr.bnancy.mail
 
-import java.io.IOException
-import java.io.InputStream
-import java.io.Reader
-import java.io.UnsupportedEncodingException
+import java.io.*
 import java.net.InetAddress
+import java.nio.charset.StandardCharsets
 
 fun getHostname(): String {
     return InetAddress.getLocalHost().canonicalHostName
@@ -51,7 +49,7 @@ class CRLFTerminatedReader(
          * @throws UnsupportedEncodingException
          * *             if the named charset is not supported
          */
-        internal var `in`: InputStream) : Reader() {
+        internal var `in`: BufferedReader) : Reader() {
 
     inner class TerminationException : IOException {
         private var where: Int = 0
@@ -76,7 +74,7 @@ class CRLFTerminatedReader(
     }
 
     @Throws(UnsupportedEncodingException::class)
-    constructor(`in`: InputStream, enc: String) : this(`in`)
+    constructor(`in`: InputStream) : this(BufferedReader(InputStreamReader(`in`, StandardCharsets.UTF_8)))
 
     private val lineBuffer = StringBuffer()
     private val EOF = -1
@@ -171,13 +169,13 @@ class CRLFTerminatedReader(
 
     @Throws(IOException::class)
     override fun ready(): Boolean {
-        return this.`in`.available() > 0
+        return this.`in`.ready()
     }
 
     @Throws(IOException::class)
     override fun read(cbuf: CharArray, off: Int, len: Int): Int {
         val temp = ByteArray(len)
-        val result = this.`in`.read(temp, 0, len)
+        val result = this.`in`.read(String(temp, StandardCharsets.UTF_8).toCharArray(), 0, len)
         for (i in 0 until result)
             cbuf[i] = temp[i].toChar()
         return result
