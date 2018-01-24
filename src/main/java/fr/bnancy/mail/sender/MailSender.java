@@ -36,7 +36,7 @@ public class MailSender {
       reader = new CRLFTerminatedReader(socket.getInputStream());
       writer = new PrintWriter(socket.getOutputStream());
 
-      except("250", read(reader));
+      except("220", read(reader));
 
       final String helloResponse = ehlo();
 
