@@ -1,6 +1,7 @@
 package fr.bnancy.mail.sender;
 
 import static com.fasterxml.jackson.module.kotlin.ExtensionsKt.jacksonObjectMapper;
+import static fr.bnancy.mail.UtilsKt.getHostname;
 
 import fr.bnancy.mail.CRLFTerminatedReader;
 import fr.bnancy.mail.data.Mail;
@@ -22,6 +23,7 @@ public class MailSender {
   private CRLFTerminatedReader reader;
   private PrintWriter writer;
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
+  private final String CLIENT_NAME = getHostname();
 
   public MailSender(Mail content, ServerConfig config) {
     this.content = content;
@@ -97,10 +99,17 @@ public class MailSender {
   }
 
   private String ehlo() throws IOException {
-    write(writer, "EHLO mail-server-pey");
+    write(writer, "EHLO " + CLIENT_NAME);
 
-    final String helloResponse = read(reader);
-    except("250", helloResponse);
+    String helloResponse = read(reader);
+
+    try {
+      except("250", helloResponse);
+    } catch(SMTPException e) {
+      write(writer, "HELO " + CLIENT_NAME);
+      helloResponse = read(reader);
+      except("250", helloResponse);
+    }
 
     return helloResponse;
   }
@@ -143,7 +152,7 @@ public class MailSender {
 
   private void except(String code, String content) {
     if (content.indexOf(code) != 0) {
-      throw new RuntimeException(
+      throw new SMTPException(
           "SMTP exception, expected code " + code + " and got response " + content);
     }
   }
