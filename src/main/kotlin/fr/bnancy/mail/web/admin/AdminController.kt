@@ -1,6 +1,7 @@
 package fr.bnancy.mail.web.admin
 
 import fr.bnancy.mail.data.UserAuthority
+import fr.bnancy.mail.getRSAKeyPair
 import fr.bnancy.mail.servers.pop3.Pop3Server
 import fr.bnancy.mail.servers.smtp.SmtpServer
 import fr.bnancy.mail.servers.smtp.SubmissionServer
@@ -11,6 +12,7 @@ import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
+import java.util.*
 
 @Controller
 @RequestMapping("/admin")
@@ -38,10 +40,11 @@ class AdminController {
         model.addAttribute("serverNumber", 3)
         model.addAttribute("users", userService.getAllUsers())
         model.addAttribute("roles", UserAuthority.values())
+        model.addAttribute("dkimPublicKey", Base64.getEncoder().encodeToString(getRSAKeyPair()?.public?.encoded ?: "".toByteArray()))
         return "admin/index"
     }
 
-    @RequestMapping("/start-server", method = arrayOf(RequestMethod.POST))
+    @RequestMapping("/start-server", method = [(RequestMethod.POST)])
     fun startSmtpServer(@RequestParam("server") server: String): String {
         when(server) {
             "smtp" -> {
@@ -60,7 +63,7 @@ class AdminController {
         return "redirect:/admin"
     }
 
-    @RequestMapping("/stop-server", method = arrayOf(RequestMethod.POST))
+    @RequestMapping("/stop-server", method = [(RequestMethod.POST)])
     fun stopSmtpServer(@RequestParam("server") server: String): String {
         when(server) {
             "smtp" -> {

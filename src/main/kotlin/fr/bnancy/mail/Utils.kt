@@ -3,9 +3,28 @@ package fr.bnancy.mail
 import java.io.*
 import java.net.InetAddress
 import java.nio.charset.StandardCharsets
+import java.security.KeyPair
+import java.security.KeyStore
+import java.security.interfaces.RSAPrivateKey
 
 fun getHostname(): String {
     return InetAddress.getLocalHost().canonicalHostName
+}
+
+fun getRSAKeyPair(): KeyPair? {
+
+    val keyStorePath = System.getProperty("javax.net.ssl.keyStore") ?: return null
+    val keyStorePassword = System.getProperty("javax.net.ssl.keyStorePassword").toCharArray()
+
+    val keyStore = KeyStore.getInstance("JKS")
+    val inputStream = FileInputStream(keyStorePath)
+    keyStore.load(inputStream, keyStorePassword)
+
+    val certificate = keyStore.getCertificate("mail")
+
+    val privateKey = keyStore.getKey("mail", keyStorePassword) as RSAPrivateKey
+
+    return KeyPair(certificate.publicKey, privateKey)
 }
 
 /***********************************************************************
