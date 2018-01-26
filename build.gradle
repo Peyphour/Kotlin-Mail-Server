@@ -20,7 +20,7 @@ apply plugin: 'kotlin'
 apply plugin: 'kotlin-spring'
 apply plugin: 'org.springframework.boot'
 
-version = '0.9.0'
+version = '0.9.5'
 sourceCompatibility = 1.8
 
 compileKotlin {
