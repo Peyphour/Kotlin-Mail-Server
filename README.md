@@ -8,8 +8,9 @@ Simple to deploy and use mail server.
 ## Features :
 - SMTP server with STARTTLS and multi domain support
 - Submission server on TLS (587)
-- *TODO* IMAP server on TLS (993)
-
+- POP3 server on TLS (995)
+- Spam Assassin integration
+- Webmail
 # Use
 You will need : 
 - A domain name (can be a subdomain of one you already own)

@@ -6,6 +6,15 @@ submission:
   port: 587
   sessionTimeout: 60000
 
+pop3:
+  port: 995
+  sessionTimeout: 60000
+
+spam:
+  enabled: false # You must have a working SpamAssassin and SpamD daemon before enabling this
+  spamAssassinUrl: 127.0.0.1
+  spamAssassinPort: 783
+
 spring:
   datasource:
     url: jdbc:mysql://localhost:3306/mail
