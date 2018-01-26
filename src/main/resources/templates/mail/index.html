@@ -69,6 +69,7 @@
                 <td>To</td>
                 <td>Headers</td>
                 <td>Seen</td>
+                <td>Spam</td>
                 <td>More</td>
             </tr>
             </thead>
@@ -78,6 +79,7 @@
                 <td th:id="'mail-to-' + ${mail.id}"></td>
                 <td class="mail-infos" th:id="'mail-infos-' + ${mail.id}"></td>
                 <td th:text="${mail.seen ? 'Yes' : 'No'}"></td>
+                <td th:text="${mail.spam ? 'Yes' : 'No'}"></td>
                 <td><a th:href="'/mails/' + ${mail.id}">Open</a></td>
                 <script th:inline="javascript">
                     /*<![CDATA[*/

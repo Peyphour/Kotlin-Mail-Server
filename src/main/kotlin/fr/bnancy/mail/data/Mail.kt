@@ -17,5 +17,8 @@ data class Mail(
         var content: String = "",
         var date: Date = Date.from(Instant.now()),
         var secured: Boolean = false,
-        var seen: Boolean = false
+        var seen: Boolean = false,
+        var spam: Boolean = false,
+        @Lob
+        var spamData: String = ""
 )

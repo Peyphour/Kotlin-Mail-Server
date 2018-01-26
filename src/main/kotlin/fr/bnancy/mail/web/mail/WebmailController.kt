@@ -22,7 +22,7 @@ class WebmailController {
         val email = (auth.principal as UserDetails).username
         val mails = mailRepository.findMailSummaries().filter { it.getRecipients().contains(email) }
                 .sortedByDescending { it.getId() }
-                .map { it -> MailSummary(it.getId(), it.getHeaders(), it.getSeen()) }
+                .map { it -> MailSummary(it.getId(), it.getHeaders(), it.getSeen(), it.getSpam()) }
         model.addAttribute("mails", mails)
         return "mail/index"
     }

@@ -24,6 +24,9 @@ class MailDeliveryService {
     @Autowired
     lateinit var mailRepository: MailRepository
 
+    @Autowired
+    lateinit var spamService: SpamService
+
     private val externalDeliveryQueue: LinkedList<SmtpSession> = LinkedList()
     private val internalDeliveryQueue: LinkedList<SmtpSession> = LinkedList()
     private val tryLaterDeliveryQueue: LinkedList<Pair<SmtpSession, Long>> = LinkedList()
@@ -47,7 +50,10 @@ class MailDeliveryService {
     fun deliverInternalMail() {
         val session = internalDeliveryQueue.poll() ?: return
         logger.debug("Delivering internal mail $session")
-        mailRepository.save(Mail(session).toEntity())
+
+        val mail = Mail(session).toEntity()
+        spamService.inspectMail(mail)
+        mailRepository.save(mail)
     }
 
     @Scheduled(fixedDelay = 1000, initialDelay = 1000)

@@ -5,4 +5,5 @@ interface MailProjection {
     fun getRecipients(): ArrayList<String>
     fun getHeaders(): String
     fun getSeen(): Boolean
+    fun getSpam(): Boolean
 }

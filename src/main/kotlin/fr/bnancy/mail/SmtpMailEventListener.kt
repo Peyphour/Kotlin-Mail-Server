@@ -2,9 +2,7 @@ package fr.bnancy.mail
 
 import fr.bnancy.mail.repository.UserRepository
 import fr.bnancy.mail.servers.smtp.data.SmtpSession
-import fr.bnancy.mail.servers.smtp.data.SmtpSessionState
 import fr.bnancy.mail.servers.smtp.listeners.SmtpSessionListener
-import fr.bnancy.mail.service.IpBlacklistService
 import fr.bnancy.mail.service.MailDeliveryService
 import fr.bnancy.mail.service.UserService
 import org.springframework.beans.factory.annotation.Autowired
@@ -19,9 +17,6 @@ class SmtpMailEventListener : SmtpSessionListener {
 
     @Autowired
     private lateinit var userRepository: UserRepository
-
-    @Autowired
-    private lateinit var ipBlacklistService: IpBlacklistService
 
     @Autowired
     private lateinit var userService: UserService
@@ -44,8 +39,6 @@ class SmtpMailEventListener : SmtpSessionListener {
 
     override fun sessionOpened(smtpSession: SmtpSession) {
         logger.info(smtpSession.toString())
-        if(ipBlacklistService.blacklistedIp(smtpSession.netAddress))
-            smtpSession.stateSmtp.add(SmtpSessionState.QUIT)
     }
 
     override fun sessionClosed(smtpSession: SmtpSession) {
