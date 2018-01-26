@@ -45,7 +45,6 @@ public class MailSender {
       final String helloResponse = ehlo();
 
       if (helloResponse.contains("STARTTLS")) {
-
         startTls();
 
         final SSLSocketFactory sslSocketFactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
@@ -57,7 +56,7 @@ public class MailSender {
         newSocket.startHandshake();
 
         reader = new CRLFTerminatedReader(newSocket.getInputStream());
-        writer = new PrintWriter(newSocket.getOutputStream());
+        writer = new PrintWriter(new OutputStreamWriter(newSocket.getOutputStream(), StandardCharsets.UTF_8));
 
         socket = newSocket;
 
