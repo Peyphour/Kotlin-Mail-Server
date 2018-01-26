@@ -20,9 +20,11 @@ fun getRSAKeyPair(): KeyPair? {
     val inputStream = FileInputStream(keyStorePath)
     keyStore.load(inputStream, keyStorePassword)
 
-    val certificate = keyStore.getCertificate("mail")
+    val alias = keyStore.aliases().nextElement()
 
-    val privateKey = keyStore.getKey("mail", keyStorePassword) as RSAPrivateKey
+    val certificate = keyStore.getCertificate(alias)
+
+    val privateKey = keyStore.getKey(alias, keyStorePassword) as RSAPrivateKey
 
     return KeyPair(certificate.publicKey, privateKey)
 }
