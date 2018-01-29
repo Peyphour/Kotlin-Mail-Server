@@ -1,15 +1,63 @@
 package fr.bnancy.mail
 
+import org.xbill.DNS.*
+import org.xbill.DNS.Type.A
 import java.io.*
+import java.net.DatagramSocket
 import java.net.InetAddress
 import java.nio.charset.StandardCharsets
 import java.security.KeyPair
 import java.security.KeyStore
 import java.security.interfaces.RSAPrivateKey
 
+
+
+
+
 fun getHostname(): String {
     return InetAddress.getLocalHost().canonicalHostName
 }
+
+fun getLocalIp(): String {
+    DatagramSocket().use { socket ->
+        socket.connect(InetAddress.getByName("8.8.8.8"), 10002)
+        return socket.localAddress.hostAddress
+    }
+}
+
+fun getHostIp(host: String): String {
+    val lookups = Lookup(host, A).run()
+    return lookups[0].rdataToString()
+}
+
+@Throws(IOException::class)
+fun reverseDns(hostIp: String): String {
+    val res = ExtendedResolver()
+
+
+    val name = ReverseMap.fromAddress(hostIp)
+
+    val type = Type.PTR
+
+    val dclass = DClass.IN
+
+    val rec = Record.newRecord(name, type, dclass)
+
+    val query = Message.newQuery(rec)
+
+    val response = res.send(query)
+
+
+    val answers = response.getSectionArray(Section.ANSWER)
+
+    return if (answers.size == 0)
+
+        hostIp
+    else
+
+        answers[0].rdataToString()
+}
+
 
 fun getRSAKeyPair(): KeyPair? {
 
