@@ -40,7 +40,7 @@ class Bootstrap {
         }
 
         // Check keystore
-        if(keystorePath) {
+        if(!keystorePath) {
             logger.error("No Java keyStore specified, POP3 and Submission servers will not work!")
         }
 
