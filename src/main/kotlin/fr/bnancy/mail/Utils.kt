@@ -11,9 +11,6 @@ import java.security.KeyStore
 import java.security.interfaces.RSAPrivateKey
 
 
-
-
-
 fun getHostname(): String {
     return InetAddress.getLocalHost().canonicalHostName
 }

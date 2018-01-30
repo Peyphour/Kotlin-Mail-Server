@@ -19,17 +19,17 @@ class WebSecurityConfig : WebSecurityConfigurerAdapter() {
     @Throws(Exception::class)
     override fun configure(http: HttpSecurity) {
         http
-            .authorizeRequests()
+                .authorizeRequests()
                 .antMatchers("/mails/**").authenticated()
                 .antMatchers("/admin/**")
-                    .hasRole("ADMIN")
+                .hasRole("ADMIN")
                 .anyRequest().permitAll()
                 .and()
-            .formLogin()
+                .formLogin()
                 .loginPage("/login")
                 .permitAll()
                 .and()
-            .logout()
+                .logout()
                 .permitAll()
     }
 
@@ -37,7 +37,7 @@ class WebSecurityConfig : WebSecurityConfigurerAdapter() {
     @Throws(Exception::class)
     fun configureGlobal(auth: AuthenticationManagerBuilder) {
         auth
-            .userDetailsService(userDetailsService)
-            .passwordEncoder(BCryptPasswordEncoder())
+                .userDetailsService(userDetailsService)
+                .passwordEncoder(BCryptPasswordEncoder())
     }
 }

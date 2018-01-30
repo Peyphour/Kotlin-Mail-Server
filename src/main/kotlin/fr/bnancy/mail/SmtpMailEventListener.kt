@@ -32,7 +32,7 @@ class SmtpMailEventListener : SmtpSessionListener {
     }
 
     override fun acceptRecipient(recipientAddress: String, smtpSession: SmtpSession): Boolean {
-        if(!smtpSession.authenticated)
+        if (!smtpSession.authenticated)
             return userRepository.findByMail(recipientAddress) != null
         return true
     }

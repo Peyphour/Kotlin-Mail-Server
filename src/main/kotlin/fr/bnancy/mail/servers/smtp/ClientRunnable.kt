@@ -15,7 +15,7 @@ import java.net.Socket
 import javax.net.ssl.SSLSocket
 import javax.net.ssl.SSLSocketFactory
 
-class ClientRunnable(private var clientSocket: Socket, val smtpListener: SmtpSessionListener, private val sessionTimeout: Int, val commands: MutableMap<String, SmtpAbstractCommand>): Runnable {
+class ClientRunnable(private var clientSocket: Socket, val smtpListener: SmtpSessionListener, private val sessionTimeout: Int, val commands: MutableMap<String, SmtpAbstractCommand>) : Runnable {
 
     private var running: Boolean = true
     val smtpSession: SmtpSession = SmtpSession()
@@ -32,31 +32,31 @@ class ClientRunnable(private var clientSocket: Socket, val smtpListener: SmtpSes
         smtpSession.netAddress = this.clientSocket.inetAddress.hostAddress
         smtpListener.sessionOpened(smtpSession)
 
-        if(clientSocket is SSLSocket) {
+        if (clientSocket is SSLSocket) {
             smtpSession.secured = true
         }
 
         write(out, SmtpResponseCode.HELO("${getHostname()} ESMTP Ready").code)
 
-        while(running && (System.currentTimeMillis() - timeout < sessionTimeout)) {
+        while (running && (System.currentTimeMillis() - timeout < sessionTimeout)) {
 
             val line = reader.readLine()
 
             timeout = System.currentTimeMillis()
 
-            if(line == null) { // Received EOF
+            if (line == null) { // Received EOF
                 break
             }
             logger.debug("RCV (SMTP) : $line")
 
             val response = handleCommand(line, smtpSession)
 
-            if(response != SmtpResponseCode.EMPTY) {
+            if (response != SmtpResponseCode.EMPTY) {
                 write(out, response.code)
                 logger.debug("SND (SMTP) : ${response.code}")
             }
 
-            if(smtpSession.stateSmtp.contains(SmtpSessionState.TLS_STARTED) && (clientSocket !is SSLSocket)) { // Start TLS negotiation
+            if (smtpSession.stateSmtp.contains(SmtpSessionState.TLS_STARTED) && (clientSocket !is SSLSocket)) { // Start TLS negotiation
                 resetSession()
 
                 val sslSocket = createTlsSocket()

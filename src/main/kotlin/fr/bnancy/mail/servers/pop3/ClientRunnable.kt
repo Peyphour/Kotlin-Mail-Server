@@ -27,7 +27,7 @@ class ClientRunnable(private val clientSocket: SSLSocket, private val sessionTim
 
         write(out, "+OK POP3 ready")
 
-        while(running && (System.currentTimeMillis() - timeout < sessionTimeout)) {
+        while (running && (System.currentTimeMillis() - timeout < sessionTimeout)) {
             val line = reader.readLine() ?: // Received EOF
                     break
 
@@ -39,7 +39,7 @@ class ClientRunnable(private val clientSocket: SSLSocket, private val sessionTim
             logger.debug("SND (POP3) ${response.code}")
             write(out, response.code)
 
-            if(session.currentState == Pop3SessionState.UPDATE) {
+            if (session.currentState == Pop3SessionState.UPDATE) {
                 pop3Service.deleteMails(session.messageToDelete)
                 running = false
             }

@@ -46,17 +46,17 @@ class AdminController {
 
     @RequestMapping("/start-server", method = [(RequestMethod.POST)])
     fun startSmtpServer(@RequestParam("server") server: String): String {
-        when(server) {
+        when (server) {
             "smtp" -> {
-                if(!smtpServer.running)
+                if (!smtpServer.running)
                     smtpServer.start()
             }
             "submission" -> {
-                if(!submissionServer.running)
+                if (!submissionServer.running)
                     submissionServer.start()
             }
             "pop3" -> {
-                if(!pop3Server.running)
+                if (!pop3Server.running)
                     pop3Server.start()
             }
         }
@@ -65,17 +65,17 @@ class AdminController {
 
     @RequestMapping("/stop-server", method = [(RequestMethod.POST)])
     fun stopSmtpServer(@RequestParam("server") server: String): String {
-        when(server) {
+        when (server) {
             "smtp" -> {
-                if(smtpServer.running)
+                if (smtpServer.running)
                     smtpServer.stop()
             }
             "submission" -> {
-                if(submissionServer.running)
+                if (submissionServer.running)
                     submissionServer.stop()
             }
             "pop3" -> {
-                if(pop3Server.running)
+                if (pop3Server.running)
                     pop3Server.stop()
             }
         }

@@ -11,7 +11,7 @@ data class User(
         var id: Long = 0,
 
         @Column(unique = true)
-        var mail: String= "",
+        var mail: String = "",
 
         var password: String = "",
 

@@ -9,15 +9,15 @@ import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.stereotype.Service
 
 @Service
-class UserDetailsServiceImpl: UserDetailsService {
+class UserDetailsServiceImpl : UserDetailsService {
 
     @Autowired
     lateinit var userRepository: UserRepository
 
     override fun loadUserByUsername(username: String?): UserDetails {
-        if(username != null) {
+        if (username != null) {
             val user = userRepository.findByMail(username)
-            if(user != null) {
+            if (user != null) {
                 return UserDetailsImpl(user)
             }
         }
@@ -26,7 +26,7 @@ class UserDetailsServiceImpl: UserDetailsService {
 
     class UserDetailsImpl(private val user: User) : UserDetails {
         override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
-            return user.authorities.map { GrantedAuthority { it.name} }.toMutableList()
+            return user.authorities.map { GrantedAuthority { it.name } }.toMutableList()
         }
 
         override fun isEnabled(): Boolean {

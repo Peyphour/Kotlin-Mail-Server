@@ -18,7 +18,7 @@ class HomeController {
 
     @RequestMapping
     fun index(model: Model): String {
-        if(userService.getAllUsers().count() == 0)
+        if (userService.getAllUsers().count() == 0)
             return "setup"
         return "index"
     }
@@ -26,7 +26,7 @@ class HomeController {
     @PostMapping("/setup")
     fun setup(@RequestParam mail: String, @RequestParam password: String): String {
 
-        if(userService.getAllUsers().count() != 0) // do not create account if an account already exists
+        if (userService.getAllUsers().count() != 0) // do not create account if an account already exists
             return "redirect:/"
 
         userService.createUser(mail, password, UserAuthority.ROLE_ADMIN)

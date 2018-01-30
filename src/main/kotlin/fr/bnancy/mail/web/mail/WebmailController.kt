@@ -31,7 +31,7 @@ class WebmailController {
     fun getMail(model: Model, auth: Authentication, @PathVariable id: Long): String {
         val mail = mailRepository.findOne(id)
         val userEmail = (auth.principal as UserDetails).username
-        if(mail == null ||  !mail.recipients.contains(userEmail)) {
+        if (mail == null || !mail.recipients.contains(userEmail)) {
             return "redirect:/mails"
         }
         model.addAttribute("mail", mail)

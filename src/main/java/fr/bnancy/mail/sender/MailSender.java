@@ -20,12 +20,12 @@ import org.slf4j.LoggerFactory;
 
 public class MailSender {
 
+  private final Logger logger = LoggerFactory.getLogger(this.getClass());
+  private final String CLIENT_NAME = getHostname();
   private Mail content;
   private ServerConfig config;
   private CRLFTerminatedReader reader;
   private PrintWriter writer;
-  private final Logger logger = LoggerFactory.getLogger(this.getClass());
-  private final String CLIENT_NAME = getHostname();
 
   public MailSender(Mail content, ServerConfig config) {
     this.content = content;
@@ -38,7 +38,8 @@ public class MailSender {
       Socket socket = new Socket(config.getHost(), config.getPort());
 
       reader = new CRLFTerminatedReader(socket.getInputStream());
-      writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8));
+      writer = new PrintWriter(
+          new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8));
 
       except("220", read(reader));
 
@@ -56,7 +57,8 @@ public class MailSender {
         newSocket.startHandshake();
 
         reader = new CRLFTerminatedReader(newSocket.getInputStream());
-        writer = new PrintWriter(new OutputStreamWriter(newSocket.getOutputStream(), StandardCharsets.UTF_8));
+        writer = new PrintWriter(
+            new OutputStreamWriter(newSocket.getOutputStream(), StandardCharsets.UTF_8));
 
         socket = newSocket;
 
@@ -106,7 +108,7 @@ public class MailSender {
 
     try {
       except("250", helloResponse);
-    } catch(SMTPException e) {
+    } catch (SMTPException e) {
       write(writer, "HELO " + CLIENT_NAME);
       helloResponse = read(reader);
       except("250", helloResponse);

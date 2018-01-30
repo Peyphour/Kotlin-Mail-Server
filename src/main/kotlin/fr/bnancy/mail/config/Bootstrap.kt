@@ -33,14 +33,14 @@ class Bootstrap {
     @PostConstruct
     fun bootstrap() {
         val keystorePath = System.getProperty("javax.net.ssl.keyStore") != null
-        if(autoStartServers && keystorePath) {
+        if (autoStartServers && keystorePath) {
             submissionServer.start()
             pop3Server.start()
             smtpServer.start()
         }
 
         // Check keystore
-        if(!keystorePath) {
+        if (!keystorePath) {
             logger.error("No Java keyStore specified, POP3 and Submission servers will not work!")
         }
 
@@ -49,13 +49,13 @@ class Bootstrap {
         val hostnameIp = getHostIp(hostname)
         val reverseHostname = reverseDns(ip).removeSuffix(".")
 
-        if(reverseHostname != hostname) {
+        if (reverseHostname != hostname) {
             logger.error("Reverse DNS lookup for {} does not resolve to {} but to {}", ip, hostname, reverseHostname)
         } else {
             logger.info("Reverse DNS lookup for {} resolve to {}, all good !", ip, hostname)
         }
 
-        if(hostnameIp != ip) {
+        if (hostnameIp != ip) {
             logger.error("DNS lookup for domain {} returns {} instead of detected IP {}", hostname, hostnameIp, ip)
         } else {
             logger.info("DNS lookup for domain {} returns previously detected IP {}, all good !", hostname, hostnameIp)

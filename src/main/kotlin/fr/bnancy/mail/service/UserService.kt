@@ -19,7 +19,7 @@ class UserService {
     @Transactional
     fun createUser(username: String, password: String, role: UserAuthority) {
 
-        if(userRepository.findByMail(username) != null)
+        if (userRepository.findByMail(username) != null)
             return
 
         val encoder = BCryptPasswordEncoder()
@@ -37,7 +37,7 @@ class UserService {
     }
 
     fun deleteUser(email: String) {
-        if((SecurityContextHolder.getContext().authentication.principal as UserDetailsServiceImpl.UserDetailsImpl).username == email) // Do not delete current logged in account
+        if ((SecurityContextHolder.getContext().authentication.principal as UserDetailsServiceImpl.UserDetailsImpl).username == email) // Do not delete current logged in account
             return
         userRepository.delete(userRepository.findByMail(email))
     }

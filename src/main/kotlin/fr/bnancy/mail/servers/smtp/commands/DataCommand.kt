@@ -1,23 +1,23 @@
 package fr.bnancy.mail.servers.smtp.commands
 
 import fr.bnancy.mail.servers.smtp.commands.annotations.SmtpCommand
+import fr.bnancy.mail.servers.smtp.data.SmtpResponseCode
 import fr.bnancy.mail.servers.smtp.data.SmtpSession
 import fr.bnancy.mail.servers.smtp.data.SmtpSessionState
-import fr.bnancy.mail.servers.smtp.data.SmtpResponseCode
 import fr.bnancy.mail.servers.smtp.listeners.SmtpSessionListener
 
 @SmtpCommand("DATA")
-class DataCommand: SmtpAbstractCommand {
+class DataCommand : SmtpAbstractCommand {
     override fun execute(data: String, smtpSession: SmtpSession, smtpListener: SmtpSessionListener): SmtpResponseCode {
-        if(!smtpSession.stateSmtp.contains(SmtpSessionState.RECIPIENT_ADDED))
+        if (!smtpSession.stateSmtp.contains(SmtpSessionState.RECIPIENT_ADDED))
             return SmtpResponseCode.BAD_SEQUENCE("Must issue RCPT first.")
 
-        if(!smtpSession.receivingData) {
+        if (!smtpSession.receivingData) {
             smtpSession.receivingData = true
             return SmtpResponseCode.DATA("End data with <CR><LF>.<CR><LF>")
         } else {
             smtpSession.content += (data + "\r\n")
-            if(smtpSession.content.endsWith("\r\n.\r\n")) {
+            if (smtpSession.content.endsWith("\r\n.\r\n")) {
                 smtpSession.content = smtpSession.content.dropLast(5) // remove CRLF.CRLF
                 smtpSession.receivingData = false
                 smtpSession.stateSmtp.add(SmtpSessionState.DATA)

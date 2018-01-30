@@ -45,13 +45,13 @@ class SubmissionServer {
         this.running = true
         try {
             this.sslServerSocket = SSLServerSocketFactory.getDefault().createServerSocket(configSubmission.port) as SSLServerSocket
-        } catch(e: Exception) {
+        } catch (e: Exception) {
             logger.severe("Couldn't start Submission server : ${e.message}")
             this.running = false
             return
         }
         Thread({
-            while(running) {
+            while (running) {
                 val client: Socket = this.sslServerSocket.accept()
                 clients.add(ClientRunnable(client, smtpListener, configSubmission.sessionTimeout, commands))
                 Thread(clients[clients.size - 1], "client-runnable-${client.inetAddress.hostName}").start()
@@ -79,7 +79,7 @@ class SubmissionServer {
     @Scheduled(fixedDelay = 1000 * 60 * 60, initialDelay = 1000 * 60 * 60) // One call per hour
     fun cleanupHangingClients() {
         logger.info("Starting to clean threads")
-        if(!this.running)
+        if (!this.running)
             return
         this.stop()
         Thread.sleep(1000)

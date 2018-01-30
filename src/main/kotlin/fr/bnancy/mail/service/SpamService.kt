@@ -21,13 +21,13 @@ class SpamService {
 
     fun inspectMail(mail: Mail) {
 
-        if(!config.enabled)
+        if (!config.enabled)
             return
 
         val headers: Array<Header> = jacksonObjectMapper().readValue(mail.headers)
         var fullMail = ""
 
-        headers.forEach { fullMail += it.key + ":" + it.value + "\r\n"}
+        headers.forEach { fullMail += it.key + ":" + it.value + "\r\n" }
         fullMail += mail.content
 
         val client = SpamdClient(config.spamAssassinUrl, config.spamAssassinPort,

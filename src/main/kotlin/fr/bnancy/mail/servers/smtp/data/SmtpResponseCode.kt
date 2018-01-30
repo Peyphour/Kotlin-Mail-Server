@@ -18,8 +18,8 @@ enum class SmtpResponseCode(var code: String) {
     UNKNOWN_COMMAND("550");
 
     operator fun invoke(s: String = ""): SmtpResponseCode {
-        if(code.length >= 3)
-            code = code.substring(0, 3) + when(this) {
+        if (code.length >= 3)
+            code = code.substring(0, 3) + when (this) {
                 EHLO -> ""
                 else -> " " // Add a space when not EHLO
             } + s

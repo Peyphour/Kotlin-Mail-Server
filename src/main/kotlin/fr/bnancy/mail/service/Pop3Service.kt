@@ -23,7 +23,7 @@ class Pop3Service {
     fun messageExistsForUser(user: String, id: Long): Boolean {
         val mail = mailRepository.findOne(id)
 
-        return when(mail) {
+        return when (mail) {
             null -> false
             else -> mail.recipients.contains(user)
         }
@@ -33,13 +33,13 @@ class Pop3Service {
         val mail = mailRepository.findOne(id)
         val headers: Array<Header> = jacksonObjectMapper().readValue(mail.headers)
         var content = ""
-        headers.forEach { content += it.key + ":" + it.value + "\r\n"}
+        headers.forEach { content += it.key + ":" + it.value + "\r\n" }
         content += mail.content
 
         return content
     }
 
-    fun getMailBoxStatistics(user: String) : String {
+    fun getMailBoxStatistics(user: String): String {
         var totalMail = 0
         var totalSize = 0
         mailRepository.findMailSummaries()
@@ -53,22 +53,22 @@ class Pop3Service {
         var response = ""
         mailRepository.findMailSummaries()
                 .filter { it.getRecipients().contains(user) }
-                .also { response += it.size.toString(10) + " messages:\r\n"}
+                .also { response += it.size.toString(10) + " messages:\r\n" }
                 .map { mailRepository.findOne(it.getId()) }
-                .forEach {response += it.id.toString(10) + " " + getFullMailContent(it.id).length + "\r\n"}
+                .forEach { response += it.id.toString(10) + " " + getFullMailContent(it.id).length + "\r\n" }
         response += "."
         return response
     }
 
     fun deleteMails(messageToDelete: MutableList<Long>) {
-        messageToDelete.forEach({mailRepository.delete(it)})
+        messageToDelete.forEach({ mailRepository.delete(it) })
     }
 
     fun getUidl(user: String): String {
         var response = ""
         mailRepository.findMailSummaries()
                 .filter { it.getRecipients().contains(user) }
-                .forEach { response += it.getId().toString(10) + " " + it.getId().toString(10) + "\r\n"}
+                .forEach { response += it.getId().toString(10) + " " + it.getId().toString(10) + "\r\n" }
         response += "."
         return response
     }

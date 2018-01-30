@@ -44,13 +44,13 @@ class SmtpServer {
         this.running = true
         try {
             this.socketServer = ServerSocket(this.configSmtp.port)
-        } catch(e: Exception) {
+        } catch (e: Exception) {
             logger.severe("Couldn't start SMTP server : ${e.message}")
             this.running = false
             return
         }
         Thread({
-            while(running) {
+            while (running) {
                 val client: Socket = this.socketServer.accept()
                 clients.add(ClientRunnable(client, smtpListener, configSmtp.sessionTimeout, commands))
                 Thread(clients[clients.size - 1], "client-runnable-${client.inetAddress.hostName}").start()
@@ -78,7 +78,7 @@ class SmtpServer {
     @Scheduled(fixedDelay = 1000 * 60 * 60, initialDelay = 1000 * 60 * 60) // One call per hour
     fun cleanupHangingClients() {
         logger.info("Starting to clean threads")
-        if(!this.running)
+        if (!this.running)
             return
         this.stop()
         Thread.sleep(1000)

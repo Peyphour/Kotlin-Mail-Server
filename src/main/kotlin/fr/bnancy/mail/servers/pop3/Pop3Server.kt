@@ -44,13 +44,13 @@ class Pop3Server {
         this.running = true
         try {
             this.sslServerSocket = SSLServerSocketFactory.getDefault().createServerSocket(pop3Config.port) as SSLServerSocket
-        } catch(e: Exception) {
+        } catch (e: Exception) {
             logger.severe("Couldn't start POP3 server : ${e.message}")
             this.running = false
             return
         }
         Thread({
-            while(running) {
+            while (running) {
                 val client: SSLSocket = sslServerSocket.accept() as SSLSocket
                 clients.add(ClientRunnable(client, pop3Config.sessionTimeout, commands, pop3Service))
                 Thread(clients[clients.size - 1], "client-runnable-${client.inetAddress.hostName}").start()
@@ -77,7 +77,7 @@ class Pop3Server {
     @Scheduled(fixedDelay = 1000 * 60 * 60, initialDelay = 1000 * 60 * 60) // One call per hour
     fun cleanupHangingClients() {
         logger.info("Starting to clean threads")
-        if(!this.running)
+        if (!this.running)
             return
         this.stop()
         Thread.sleep(1000)
